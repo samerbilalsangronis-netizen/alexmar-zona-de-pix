@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Screen } from '../components/Screen';
 import { GrillaItems, filaVacia, type FilaGrid } from '../components/GrillaItems';
+import { LineaDetalle } from '../components/LineaDetalle';
 import { supabase } from '../lib/supabaseClient';
 import { money, fecha } from '../lib/format';
 import { METODOS_PAGO, type Cliente, type LineaCuenta } from '../types';
@@ -14,6 +15,7 @@ export function HojaCliente() {
   const [cliente, setCliente] = useState<Cliente | null>(null);
   const [lineas, setLineas] = useState<LineaCuenta[]>([]);
   const [cargando, setCargando] = useState(true);
+  const [lineaEditar, setLineaEditar] = useState<LineaCuenta | null>(null);
 
   async function cargar() {
     if (!id) return;
@@ -104,7 +106,9 @@ export function HojaCliente() {
         </div>
       </div>
 
-      <Libro lineas={lineas} />
+      <Libro lineas={lineas} onEditar={setLineaEditar} onCambio={cargar} />
+
+      {lineaEditar && <LineaDetalle linea={lineaEditar} onCerrar={() => setLineaEditar(null)} onGuardado={cargar} />}
 
       <div className="mt-4 grid grid-cols-3 gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-1)] p-4 text-center">
         <div>
@@ -127,7 +131,21 @@ export function HojaCliente() {
   );
 }
 
-function Libro({ lineas }: { lineas: LineaCuenta[] }) {
+function Libro({
+  lineas,
+  onEditar,
+  onCambio,
+}: {
+  lineas: LineaCuenta[];
+  onEditar: (linea: LineaCuenta) => void;
+  onCambio: () => void;
+}) {
+  async function eliminarRapido(linea: LineaCuenta) {
+    if (!confirm('¿Eliminar este ítem? No afecta al resto de la cuenta.')) return;
+    await supabase.from('detalle_cuentas').update({ eliminado: true }).eq('id', linea.id);
+    onCambio();
+  }
+
   if (lineas.length === 0) {
     return (
       <div className="mt-4 rounded-lg border border-[var(--border)] p-4">
@@ -140,24 +158,40 @@ function Libro({ lineas }: { lineas: LineaCuenta[] }) {
       {lineas.map((l) => {
         if (l.tipo_linea === 'TITULO') {
           return (
-            <div key={l.id} className="bg-[var(--accent)] px-4 py-1.5 text-center font-display text-xs font-bold text-black">
-              « {l.descripcion} »
+            <div key={l.id} className="flex items-center justify-between bg-[var(--accent)] px-4 py-1.5 text-black">
+              <span className="font-display text-xs font-bold">« {l.descripcion} »</span>
+              <div className="flex gap-2">
+                <button onClick={() => onEditar(l)} className="text-xs hover:opacity-70" title="Editar">
+                  ✏️
+                </button>
+                <button onClick={() => eliminarRapido(l)} className="text-xs hover:opacity-70" title="Eliminar">
+                  🗑
+                </button>
+              </div>
             </div>
           );
         }
         const esAbono = l.tipo_linea === 'ABONO';
         return (
-          <div key={l.id} className={`flex items-center justify-between px-4 py-3 ${esAbono ? 'bg-[var(--good)]/10' : ''}`}>
-            <div>
+          <div key={l.id} className={`flex items-center justify-between gap-2 px-4 py-3 ${esAbono ? 'bg-[var(--good)]/10' : ''}`}>
+            <div className="min-w-0">
               <p className="text-white">{esAbono ? `ABONO${l.metodo_pago ? ` · ${l.metodo_pago}` : ''}` : l.descripcion}</p>
               <p className="text-xs text-[var(--text-muted)]">
                 {fecha(l.fecha)} {!esAbono && l.precio_unitario ? `· ${l.cantidad} x ${money(l.precio_unitario)}` : ''}
               </p>
             </div>
-            <p className={esAbono ? 'text-[var(--good)]' : 'text-white'}>
-              {esAbono ? '− ' : ''}
-              {money(l.total_linea)}
-            </p>
+            <div className="flex shrink-0 items-center gap-2">
+              <p className={esAbono ? 'text-[var(--good)]' : 'text-white'}>
+                {esAbono ? '− ' : ''}
+                {money(l.total_linea)}
+              </p>
+              <button onClick={() => onEditar(l)} className="text-sm text-[var(--text-muted)] hover:text-white" title="Editar">
+                ✏️
+              </button>
+              <button onClick={() => eliminarRapido(l)} className="text-sm text-[var(--text-muted)] hover:text-[var(--bad)]" title="Eliminar">
+                🗑
+              </button>
+            </div>
           </div>
         );
       })}
