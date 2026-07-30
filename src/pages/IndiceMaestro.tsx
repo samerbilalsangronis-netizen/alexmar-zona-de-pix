@@ -83,25 +83,35 @@ export function IndiceMaestro() {
             ? Math.floor((Date.now() - new Date(c.fecha_ultimo_abono).getTime()) / 86_400_000)
             : null;
           return (
-            <Link
+            <div
               key={c.id}
-              to={`/clientes/${c.id}`}
               className={`flex items-center justify-between gap-3 border-l-4 px-4 py-3 hover:bg-[var(--surface-1)] ${
                 estatus === 'MORA' ? 'border-l-[var(--bad)]' : estatus === 'REVISAR' ? 'border-l-[var(--warn)]' : 'border-l-[var(--good)]'
               }`}
             >
-              <div>
+              <Link to={`/clientes/${c.id}`} className="min-w-0 flex-1">
                 <p className="font-bold text-white">{c.nombre_cliente}</p>
                 {c.telefono && <p className="text-xs text-[var(--text-muted)]">{c.telefono}</p>}
                 <div className="mt-1 flex items-center gap-2">
                   <EstatusBadge estatus={estatus} />
                   {dias !== null && <span className="text-xs text-[var(--text-muted)]">{dias} días</span>}
                 </div>
-              </div>
-              <p className={`font-display text-lg ${c.saldo_pendiente > 0 ? 'text-[var(--bad)]' : 'text-[var(--good)]'}`}>
+              </Link>
+              <Link to={`/clientes/${c.id}`} className={`font-display text-lg ${c.saldo_pendiente > 0 ? 'text-[var(--bad)]' : 'text-[var(--good)]'}`}>
                 {money(c.saldo_pendiente)}
-              </p>
-            </Link>
+              </Link>
+              <button
+                onClick={async () => {
+                  if (!confirm(`¿Quitar a "${c.nombre_cliente}" del Índice Maestro?\n\nSus datos no se destruyen, solo deja de aparecer en la lista.`)) return;
+                  await supabase.from('clientes').update({ eliminado: true }).eq('id', c.id);
+                  cargar();
+                }}
+                title="Quitar cliente"
+                className="shrink-0 rounded p-1.5 text-[var(--text-muted)] hover:bg-[var(--bad)]/20 hover:text-[var(--bad)]"
+              >
+                🗑
+              </button>
+            </div>
           );
         })}
       </div>

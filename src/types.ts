@@ -33,10 +33,13 @@ export interface LineaCuenta {
   precio_unitario: number | null;
   costo_unitario: number | null;
   total_linea: number;
+  metodo_pago: string | null;
   id_producto: string | null;
   eliminado: boolean;
   created_at: string;
 }
+
+export const METODOS_PAGO = ['EFECTIVO', 'BINANCE', 'ZELLE', 'BOLIVARES', 'PESOS', 'OTRO'] as const;
 
 export interface Producto {
   id: string;

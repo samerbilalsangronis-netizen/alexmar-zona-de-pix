@@ -111,6 +111,7 @@ create table if not exists detalle_cuentas (
   precio_unitario numeric,
   costo_unitario numeric,
   total_linea numeric not null default 0,
+  metodo_pago text, -- solo para ABONO: EFECTIVO | BINANCE | ZELLE | BOLIVARES | PESOS | OTRO
   id_producto uuid references inventario(id) on delete set null,
   eliminado boolean not null default false,
   created_at timestamptz not null default now(),
@@ -216,3 +217,12 @@ alter publication supabase_realtime add table clientes;
 alter publication supabase_realtime add table detalle_cuentas;
 alter publication supabase_realtime add table inventario;
 alter publication supabase_realtime add table notas;
+
+-- ═══════════════════════════════════════════════════════════════════
+--  MIGRACIONES — cambios posteriores al esquema inicial. Cada bloque es
+--  idempotente (se puede correr de nuevo sin romper nada), así que si
+--  ejecutás este archivo entero en un proyecto nuevo, ya queda con todo.
+-- ═══════════════════════════════════════════════════════════════════
+
+-- 2026-07 · método de pago del abono (solo informativo)
+alter table detalle_cuentas add column if not exists metodo_pago text;

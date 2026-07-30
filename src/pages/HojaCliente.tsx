@@ -1,12 +1,15 @@
-import { useEffect, useState, type FormEvent } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Screen } from '../components/Screen';
 import { supabase } from '../lib/supabaseClient';
 import { money, fecha } from '../lib/format';
-import type { Cliente, LineaCuenta } from '../types';
+import { METODOS_PAGO, type Cliente, type LineaCuenta } from '../types';
+
+const FILAS_INICIALES = 8;
 
 export function HojaCliente() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [cliente, setCliente] = useState<Cliente | null>(null);
   const [lineas, setLineas] = useState<LineaCuenta[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -41,35 +44,58 @@ export function HojaCliente() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  async function vaciarCuenta() {
+    if (!cliente) return;
+    if (
+      !confirm(
+        `¿Vaciar la cuenta de "${cliente.nombre_cliente}"?\n\nSe borran los ${lineas.length} movimiento(s) (cargos y abonos), pero el cliente sigue en el Índice Maestro. Usalo cuando paga todo pero seguís haciéndole trabajos.`,
+      )
+    )
+      return;
+    await supabase.from('detalle_cuentas').update({ eliminado: true }).eq('id_cliente', cliente.id).eq('eliminado', false);
+    cargar();
+  }
+
   if (cargando) return <Screen title="Cargando…" backTo="/clientes"><p /></Screen>;
   if (!cliente) return <Screen title="Cliente no encontrado" backTo="/clientes"><p /></Screen>;
 
   return (
-    <Screen title={`Hoja Nº ${cliente.factura_n ?? '—'}`} backTo="/clientes">
+    <Screen
+      title={`Hoja Nº ${cliente.factura_n ?? '—'}`}
+      backTo="/clientes"
+      actions={
+        <button
+          onClick={vaciarCuenta}
+          disabled={lineas.length === 0}
+          className="rounded border border-[var(--warn)] px-3 py-1.5 text-xs font-bold text-[var(--warn)] hover:bg-[var(--warn)]/10 disabled:opacity-30"
+          title="Vaciar cuenta (el cliente sigue existiendo)"
+        >
+          🧹 Vaciar cuenta
+        </button>
+      }
+    >
       <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-1)] p-4">
-        <p className="font-display text-lg text-white">{cliente.nombre_cliente}</p>
-        <p className="text-sm text-[var(--text-muted)]">
-          {cliente.telefono ?? 'sin teléfono'} {cliente.cedula ? `· C.I. ${cliente.cedula}` : ''}
-        </p>
-      </div>
-
-      <div className="mt-4 divide-y divide-[var(--border)] rounded-lg border border-[var(--border)]">
-        {lineas.length === 0 && <p className="p-4 text-sm text-[var(--text-muted)]">Sin movimientos todavía.</p>}
-        {lineas.map((l) => (
-          <div key={l.id} className={`flex items-center justify-between px-4 py-3 ${l.tipo_linea === 'ABONO' ? 'bg-[var(--good)]/10' : ''}`}>
-            <div>
-              <p className="text-white">{l.tipo_linea === 'ABONO' ? 'ABONO recibido' : l.descripcion}</p>
-              <p className="text-xs text-[var(--text-muted)]">
-                {fecha(l.fecha)} {l.tipo_linea === 'CARGO' && l.precio_unitario ? `· ${l.cantidad} x ${money(l.precio_unitario)}` : ''}
-              </p>
-            </div>
-            <p className={l.tipo_linea === 'ABONO' ? 'text-[var(--good)]' : 'text-white'}>
-              {l.tipo_linea === 'ABONO' ? '− ' : ''}
-              {money(l.total_linea)}
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="font-display text-lg text-white">{cliente.nombre_cliente}</p>
+            <p className="text-sm text-[var(--text-muted)]">
+              {cliente.telefono ?? 'sin teléfono'} {cliente.cedula ? `· C.I. ${cliente.cedula}` : ''}
             </p>
           </div>
-        ))}
+          <button
+            onClick={async () => {
+              if (!confirm(`¿Quitar a "${cliente.nombre_cliente}" del Índice Maestro?`)) return;
+              await supabase.from('clientes').update({ eliminado: true }).eq('id', cliente.id);
+              navigate('/clientes');
+            }}
+            className="text-xs text-[var(--text-muted)] hover:text-[var(--bad)]"
+          >
+            🗑 Quitar cliente
+          </button>
+        </div>
       </div>
+
+      <Libro lineas={lineas} />
 
       <div className="mt-4 grid grid-cols-3 gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-1)] p-4 text-center">
         <div>
@@ -86,35 +112,275 @@ export function HojaCliente() {
         </div>
       </div>
 
-      <CargaRapida idCliente={cliente.id} onGuardado={cargar} />
+      <CargaCargos idCliente={cliente.id} onGuardado={cargar} />
+      <CargaAbono idCliente={cliente.id} onGuardado={cargar} />
     </Screen>
   );
 }
 
-function CargaRapida({ idCliente, onGuardado }: { idCliente: string; onGuardado: () => void }) {
-  const [tipo, setTipo] = useState<'CARGO' | 'ABONO'>('CARGO');
-  const [descripcion, setDescripcion] = useState('');
-  const [cantidad, setCantidad] = useState('1');
-  const [precio, setPrecio] = useState('');
+function Libro({ lineas }: { lineas: LineaCuenta[] }) {
+  if (lineas.length === 0) {
+    return (
+      <div className="mt-4 rounded-lg border border-[var(--border)] p-4">
+        <p className="text-sm text-[var(--text-muted)]">Sin movimientos todavía.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="mt-4 divide-y divide-[var(--border)] rounded-lg border border-[var(--border)]">
+      {lineas.map((l) => {
+        if (l.tipo_linea === 'TITULO') {
+          return (
+            <div key={l.id} className="bg-[var(--accent)] px-4 py-1.5 text-center font-display text-xs font-bold text-black">
+              « {l.descripcion} »
+            </div>
+          );
+        }
+        const esAbono = l.tipo_linea === 'ABONO';
+        return (
+          <div key={l.id} className={`flex items-center justify-between px-4 py-3 ${esAbono ? 'bg-[var(--good)]/10' : ''}`}>
+            <div>
+              <p className="text-white">{esAbono ? `ABONO${l.metodo_pago ? ` · ${l.metodo_pago}` : ''}` : l.descripcion}</p>
+              <p className="text-xs text-[var(--text-muted)]">
+                {fecha(l.fecha)} {!esAbono && l.precio_unitario ? `· ${l.cantidad} x ${money(l.precio_unitario)}` : ''}
+              </p>
+            </div>
+            <p className={esAbono ? 'text-[var(--good)]' : 'text-white'}>
+              {esAbono ? '− ' : ''}
+              {money(l.total_linea)}
+            </p>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+interface FilaGrid {
+  cantidad: string;
+  descripcion: string;
+  precio: string;
+}
+
+function filaVacia(): FilaGrid {
+  return { cantidad: '1', descripcion: '', precio: '' };
+}
+
+function CargaCargos({ idCliente, onGuardado }: { idCliente: string; onGuardado: () => void }) {
+  const [vehiculo, setVehiculo] = useState('');
+  const [filas, setFilas] = useState<FilaGrid[]>(() => Array.from({ length: FILAS_INICIALES }, filaVacia));
+  const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const refs = useRef<(HTMLInputElement | null)[][]>([]);
+
+  function actualizar(fila: number, campo: keyof FilaGrid, valor: string) {
+    setFilas((prev) => prev.map((f, i) => (i === fila ? { ...f, [campo]: valor } : f)));
+  }
+
+  function moverFoco(fila: number, col: number) {
+    const destino = refs.current[fila]?.[col];
+    destino?.focus();
+    destino?.select();
+  }
+
+  function alPresionarTecla(e: KeyboardEvent<HTMLInputElement>, fila: number, col: number) {
+    const totalFilas = filas.length;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (fila + 1 < totalFilas) moverFoco(fila + 1, col);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (fila - 1 >= 0) moverFoco(fila - 1, col);
+    } else if (e.key === 'ArrowRight') {
+      const input = e.currentTarget;
+      if (input.selectionStart === input.value.length) {
+        if (col + 1 < 3) {
+          e.preventDefault();
+          moverFoco(fila, col + 1);
+        } else if (fila + 1 < totalFilas) {
+          e.preventDefault();
+          moverFoco(fila + 1, 0);
+        }
+      }
+    } else if (e.key === 'ArrowLeft') {
+      const input = e.currentTarget;
+      if (input.selectionStart === 0) {
+        if (col - 1 >= 0) {
+          e.preventDefault();
+          moverFoco(fila, col - 1);
+        } else if (fila - 1 >= 0) {
+          e.preventDefault();
+          moverFoco(fila - 1, 2);
+        }
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (fila + 1 < totalFilas) moverFoco(fila + 1, col);
+      else agregarFilas();
+    }
+  }
+
+  function agregarFilas() {
+    setFilas((prev) => [...prev, ...Array.from({ length: FILAS_INICIALES }, filaVacia)]);
+  }
+
+  const filasCompletas = useMemo(
+    () => filas.filter((f) => f.descripcion.trim() && Number(f.precio) >= 0 && f.precio !== ''),
+    [filas],
+  );
+
+  async function guardar(e: FormEvent) {
+    e.preventDefault();
+    if (filasCompletas.length === 0) {
+      setError('Completá al menos un ítem (producto/servicio y precio).');
+      return;
+    }
+    setGuardando(true);
+    setError(null);
+
+    const ahora = Date.now();
+    const filasNuevas: Record<string, unknown>[] = [];
+
+    if (vehiculo.trim()) {
+      filasNuevas.push({
+        id_cliente: idCliente,
+        tipo_linea: 'TITULO',
+        descripcion: vehiculo.trim().toUpperCase(),
+        cantidad: 0,
+        total_linea: 0,
+        fecha: new Date(ahora).toISOString(),
+      });
+    }
+
+    filasCompletas.forEach((f, i) => {
+      const cant = Number(f.cantidad) || 1;
+      const precio = Number(f.precio) || 0;
+      filasNuevas.push({
+        id_cliente: idCliente,
+        tipo_linea: 'CARGO',
+        cantidad: cant,
+        descripcion: f.descripcion.trim(),
+        precio_unitario: precio,
+        total_linea: cant * precio,
+        fecha: new Date(ahora + i + 1).toISOString(),
+      });
+    });
+
+    const { error } = await supabase.from('detalle_cuentas').insert(filasNuevas);
+    setGuardando(false);
+    if (error) {
+      setError(error.message);
+      return;
+    }
+    setVehiculo('');
+    setFilas(Array.from({ length: FILAS_INICIALES }, filaVacia));
+    onGuardado();
+  }
+
+  return (
+    <form onSubmit={guardar} className="mt-4 rounded-lg border border-[var(--accent)] bg-[var(--surface-1)] p-4">
+      <p className="font-display text-sm text-white">Cargar ítems</p>
+
+      <label className="mt-3 block text-xs uppercase text-[var(--text-secondary)]">
+        Vehículo (opcional — para separar la factura por vehículo)
+      </label>
+      <input
+        value={vehiculo}
+        onChange={(e) => setVehiculo(e.target.value)}
+        placeholder="Ej: FORD F-150, TRITON BLANCO…"
+        className="mt-1 w-full"
+      />
+
+      <div className="mt-3 overflow-x-auto">
+        <table className="w-full min-w-[420px] border-separate border-spacing-y-1 text-sm">
+          <thead>
+            <tr className="text-left text-xs text-[var(--text-muted)]">
+              <th className="w-16 px-1 font-normal">Cant.</th>
+              <th className="px-1 font-normal">Producto o servicio</th>
+              <th className="w-28 px-1 font-normal">Precio unit.</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filas.map((f, fila) => {
+              if (!refs.current[fila]) refs.current[fila] = [null, null, null];
+              return (
+                <tr key={fila}>
+                  <td className="px-1">
+                    <input
+                      ref={(el) => {
+                        refs.current[fila][0] = el;
+                      }}
+                      value={f.cantidad}
+                      onChange={(e) => actualizar(fila, 'cantidad', e.target.value)}
+                      onKeyDown={(e) => alPresionarTecla(e, fila, 0)}
+                      type="number"
+                      min="0"
+                      className="w-full"
+                    />
+                  </td>
+                  <td className="px-1">
+                    <input
+                      ref={(el) => {
+                        refs.current[fila][1] = el;
+                      }}
+                      value={f.descripcion}
+                      onChange={(e) => actualizar(fila, 'descripcion', e.target.value)}
+                      onKeyDown={(e) => alPresionarTecla(e, fila, 1)}
+                      className="w-full"
+                    />
+                  </td>
+                  <td className="px-1">
+                    <input
+                      ref={(el) => {
+                        refs.current[fila][2] = el;
+                      }}
+                      value={f.precio}
+                      onChange={(e) => actualizar(fila, 'precio', e.target.value)}
+                      onKeyDown={(e) => alPresionarTecla(e, fila, 2)}
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      className="w-full"
+                    />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <button type="button" onClick={agregarFilas} className="mt-2 text-xs text-[var(--accent-2)] hover:underline">
+        + más filas
+      </button>
+
+      {error && <p className="mt-2 text-sm text-[var(--bad)]">{error}</p>}
+      <button disabled={guardando} className="mt-3 w-full rounded bg-white py-2 text-sm font-bold text-black disabled:opacity-50">
+        {guardando ? 'Guardando…' : `Guardar ${filasCompletas.length || ''} ítem(s)`}
+      </button>
+    </form>
+  );
+}
+
+function CargaAbono({ idCliente, onGuardado }: { idCliente: string; onGuardado: () => void }) {
+  const [monto, setMonto] = useState('');
+  const [metodo, setMetodo] = useState<string>(METODOS_PAGO[0]);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function guardar(e: FormEvent) {
     e.preventDefault();
-    const cant = Number(cantidad) || 1;
-    const precioNum = Number(precio) || 0;
-    const total = tipo === 'ABONO' ? precioNum : cant * precioNum;
-    if (tipo === 'CARGO' && !descripcion.trim()) return;
-
+    const montoNum = Number(monto);
+    if (!montoNum || montoNum <= 0) return;
     setGuardando(true);
     setError(null);
     const { error } = await supabase.from('detalle_cuentas').insert({
       id_cliente: idCliente,
-      tipo_linea: tipo,
-      cantidad: cant,
-      descripcion: tipo === 'ABONO' ? 'Abono' : descripcion.trim(),
-      precio_unitario: tipo === 'CARGO' ? precioNum : null,
-      total_linea: total,
+      tipo_linea: 'ABONO',
+      cantidad: 1,
+      descripcion: 'Abono',
+      total_linea: montoNum,
+      metodo_pago: metodo,
       fecha: new Date().toISOString(),
     });
     setGuardando(false);
@@ -122,36 +388,34 @@ function CargaRapida({ idCliente, onGuardado }: { idCliente: string; onGuardado:
       setError(error.message);
       return;
     }
-    setDescripcion('');
-    setCantidad('1');
-    setPrecio('');
+    setMonto('');
     onGuardado();
   }
 
   return (
-    <form onSubmit={guardar} className="mt-4 rounded-lg border border-[var(--accent)] bg-[var(--surface-1)] p-4">
-      <div className="flex gap-2">
-        <button type="button" onClick={() => setTipo('CARGO')} className={`flex-1 rounded py-1.5 text-sm font-bold ${tipo === 'CARGO' ? 'bg-[var(--accent)] text-black' : 'border border-[var(--border)] text-[var(--text-secondary)]'}`}>
-          CARGO
-        </button>
-        <button type="button" onClick={() => setTipo('ABONO')} className={`flex-1 rounded py-1.5 text-sm font-bold ${tipo === 'ABONO' ? 'bg-[var(--good)] text-black' : 'border border-[var(--border)] text-[var(--text-secondary)]'}`}>
-          ABONO
-        </button>
+    <form onSubmit={guardar} className="mt-4 rounded-lg border border-[var(--good)] bg-[var(--surface-1)] p-4">
+      <p className="font-display text-sm text-white">Registrar abono</p>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="Monto abonado"
+          required
+          value={monto}
+          onChange={(e) => setMonto(e.target.value)}
+        />
+        <select value={metodo} onChange={(e) => setMetodo(e.target.value)}>
+          {METODOS_PAGO.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))}
+        </select>
       </div>
-
-      {tipo === 'CARGO' ? (
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
-          <input placeholder="Producto o servicio" required value={descripcion} onChange={(e) => setDescripcion(e.target.value)} className="sm:col-span-1" />
-          <input type="number" min="0" step="1" placeholder="Cant." value={cantidad} onChange={(e) => setCantidad(e.target.value)} />
-          <input type="number" min="0" step="0.01" placeholder="Precio unit." value={precio} onChange={(e) => setPrecio(e.target.value)} />
-        </div>
-      ) : (
-        <input type="number" min="0" step="0.01" placeholder="Monto abonado" required value={precio} onChange={(e) => setPrecio(e.target.value)} className="mt-3 w-full" />
-      )}
-
       {error && <p className="mt-2 text-sm text-[var(--bad)]">{error}</p>}
-      <button disabled={guardando} className="mt-3 w-full rounded bg-white py-2 text-sm font-bold text-black disabled:opacity-50">
-        {guardando ? 'Guardando…' : 'Agregar'}
+      <button disabled={guardando} className="mt-3 w-full rounded bg-[var(--good)] py-2 text-sm font-bold text-black disabled:opacity-50">
+        {guardando ? 'Guardando…' : 'Registrar abono'}
       </button>
     </form>
   );
