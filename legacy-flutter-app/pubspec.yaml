@@ -1,0 +1,70 @@
+name: alexmar_app
+description: "ALEXMAR APP - Sistema de gestión para autoperiquitos, rotulados y servicios mecánicos. Offline-First con espejo en Google Sheets."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Gestión de estado
+  flutter_riverpod: ^2.5.1
+
+  # Navegación con guards
+  go_router: ^14.2.0
+
+  # Base de datos local (Offline-First) — UNIVERSAL (móvil + escritorio + WEB)
+  drift: ^2.18.0
+  drift_flutter: ^0.2.4           # El "adaptador": elige el motor por plataforma
+  sqlite3_flutter_libs: ^0.5.24   # Binarios SQLite para Android/iOS/desktop
+
+  # Seguridad: hash de contraseñas
+  crypto: ^3.0.3
+
+  # Persistencia de sesión
+  shared_preferences: ^2.2.3
+
+  # Motor de sincronización (Módulo 2)
+  http: ^1.2.1               # Enviar datos al Apps Script de Google Sheets
+  connectivity_plus: ^6.0.3  # Detectar cuándo vuelve el internet
+  intl: ^0.19.0              # Formato de montos en dólares ($)
+
+  # Cobranza directa (Módulo 3) — universal web + móvil
+  pdf: ^3.11.0               # Generar la factura PDF formal (en memoria)
+  printing: ^5.13.0          # Compartir/descargar PDFs en TODAS las plataformas
+  url_launcher: ^6.3.0       # Abrir el chat de WhatsApp con texto de cobro
+
+  # Catálogo visual (Módulo 4)
+  image_picker: ^1.1.2       # Cámara y galería para fotos de productos
+
+  # Tipografías digitales condensadas (se descargan en runtime;
+  # para producción 100% offline, empaquetar los .ttf en assets)
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.13.1   # Genera el ícono de la app (todos los tamaños)
+  drift_dev: ^2.18.0
+  build_runner: ^2.4.11
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Imágenes empaquetadas dentro de la app (fondo del chip ALEXMAR)
+  assets:
+    - assets/images/fondo_chip.png
+    - assets/icon/app_icon.png
+
+# ── Configuración del ícono de la app (logo ESCUDERIA ALEXMAR) ──
+flutter_launcher_icons:
+  android: true            # Genera el ícono para los teléfonos Android (APK)
+  web:
+    generated: true        # Genera el ícono para la versión web (PC)
+  image_path: "assets/icon/app_icon.png"
+  background_color_web: "#0D0D0D"
+  theme_color_web: "#00E5FF"
