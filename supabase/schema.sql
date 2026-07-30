@@ -226,3 +226,24 @@ alter publication supabase_realtime add table notas;
 
 -- 2026-07 · método de pago del abono (solo informativo)
 alter table detalle_cuentas add column if not exists metodo_pago text;
+
+-- 2026-07 · bucket de Storage para fotos de productos del inventario
+insert into storage.buckets (id, name, public)
+  values ('productos', 'productos', true)
+  on conflict (id) do nothing;
+
+drop policy if exists "productos: lectura publica" on storage.objects;
+create policy "productos: lectura publica" on storage.objects
+  for select using (bucket_id = 'productos');
+
+drop policy if exists "productos: subir autenticado" on storage.objects;
+create policy "productos: subir autenticado" on storage.objects
+  for insert with check (bucket_id = 'productos' and auth.role() = 'authenticated');
+
+drop policy if exists "productos: actualizar autenticado" on storage.objects;
+create policy "productos: actualizar autenticado" on storage.objects
+  for update using (bucket_id = 'productos' and auth.role() = 'authenticated');
+
+drop policy if exists "productos: borrar autenticado" on storage.objects;
+create policy "productos: borrar autenticado" on storage.objects
+  for delete using (bucket_id = 'productos' and auth.role() = 'authenticated');
