@@ -88,7 +88,7 @@ export function HojaCliente() {
       <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-1)] p-4">
         <div className="flex items-start justify-between">
           <div>
-            <p className="font-display text-lg text-white">{cliente.nombre_cliente}</p>
+            <p className="font-display text-lg text-[var(--text-primary)]">{cliente.nombre_cliente}</p>
             <p className="text-sm text-[var(--text-muted)]">
               {cliente.telefono ?? 'sin teléfono'} {cliente.cedula ? `· C.I. ${cliente.cedula}` : ''}
             </p>
@@ -113,7 +113,7 @@ export function HojaCliente() {
       <div className="mt-4 grid grid-cols-3 gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-1)] p-4 text-center">
         <div>
           <p className="text-xs text-[var(--text-muted)]">TOTAL CONSUMIDO</p>
-          <p className="font-display text-white">{money(cliente.total_cargado)}</p>
+          <p className="font-display text-[var(--text-primary)]">{money(cliente.total_cargado)}</p>
         </div>
         <div>
           <p className="text-xs text-[var(--text-muted)]">TOTAL ABONADO</p>
@@ -175,17 +175,17 @@ function Libro({
         return (
           <div key={l.id} className={`flex items-center justify-between gap-2 px-4 py-3 ${esAbono ? 'bg-[var(--good)]/10' : ''}`}>
             <div className="min-w-0">
-              <p className="text-white">{esAbono ? `ABONO${l.metodo_pago ? ` · ${l.metodo_pago}` : ''}` : l.descripcion}</p>
+              <p className="text-[var(--text-primary)]">{esAbono ? `ABONO${l.metodo_pago ? ` · ${l.metodo_pago}` : ''}` : l.descripcion}</p>
               <p className="text-xs text-[var(--text-muted)]">
                 {fecha(l.fecha)} {!esAbono && l.precio_unitario ? `· ${l.cantidad} x ${money(l.precio_unitario)}` : ''}
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <p className={esAbono ? 'text-[var(--good)]' : 'text-white'}>
+              <p className={esAbono ? 'text-[var(--good)]' : 'text-[var(--text-primary)]'}>
                 {esAbono ? '− ' : ''}
                 {money(l.total_linea)}
               </p>
-              <button onClick={() => onEditar(l)} className="text-sm text-[var(--text-muted)] hover:text-white" title="Editar">
+              <button onClick={() => onEditar(l)} className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]" title="Editar">
                 ✏️
               </button>
               <button onClick={() => eliminarRapido(l)} className="text-sm text-[var(--text-muted)] hover:text-[var(--bad)]" title="Eliminar">
@@ -260,7 +260,7 @@ function CargaCargos({ idCliente, onGuardado }: { idCliente: string; onGuardado:
 
   return (
     <form onSubmit={guardar} className="mt-4 rounded-lg border border-[var(--accent)] bg-[var(--surface-1)] p-4">
-      <p className="font-display text-sm text-white">Cargar ítems</p>
+      <p className="font-display text-sm text-[var(--text-primary)]">Cargar ítems</p>
 
       <label className="mt-3 block text-xs uppercase text-[var(--text-secondary)]">
         Vehículo (opcional — para separar la factura por vehículo)
@@ -275,7 +275,7 @@ function CargaCargos({ idCliente, onGuardado }: { idCliente: string; onGuardado:
       <GrillaItems filas={filas} onCambiar={setFilas} filasPorTanda={FILAS_INICIALES} />
 
       {error && <p className="mt-2 text-sm text-[var(--bad)]">{error}</p>}
-      <button disabled={guardando} className="mt-3 w-full rounded bg-white py-2 text-sm font-bold text-black disabled:opacity-50">
+      <button disabled={guardando} className="mt-3 w-full rounded bg-[var(--text-primary)] py-2 text-sm font-bold text-[var(--bg)] disabled:opacity-50">
         {guardando ? 'Guardando…' : `Guardar ${filasCompletas.length || ''} ítem(s)`}
       </button>
     </form>
@@ -314,7 +314,7 @@ function CargaAbono({ idCliente, onGuardado }: { idCliente: string; onGuardado: 
 
   return (
     <form onSubmit={guardar} className="mt-4 rounded-lg border border-[var(--good)] bg-[var(--surface-1)] p-4">
-      <p className="font-display text-sm text-white">Registrar abono</p>
+      <p className="font-display text-sm text-[var(--text-primary)]">Registrar abono</p>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         <input
           type="number"

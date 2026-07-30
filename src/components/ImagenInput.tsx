@@ -4,10 +4,11 @@ import { subirFotoProducto } from '../lib/imagenes';
 interface ImagenInputProps {
   url: string | null;
   onSubido: (url: string) => void;
+  subir?: (archivo: File) => Promise<string>;
 }
 
 /** Botón de foto: en el celular abre cámara/galería directo (input file nativo). */
-export function ImagenInput({ url, onSubido }: ImagenInputProps) {
+export function ImagenInput({ url, onSubido, subir = subirFotoProducto }: ImagenInputProps) {
   const ref = useRef<HTMLInputElement>(null);
   const [subiendo, setSubiendo] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +19,7 @@ export function ImagenInput({ url, onSubido }: ImagenInputProps) {
     setSubiendo(true);
     setError(null);
     try {
-      const urlSubida = await subirFotoProducto(archivo);
+      const urlSubida = await subir(archivo);
       onSubido(urlSubida);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo subir la foto');

@@ -247,3 +247,111 @@ create policy "productos: actualizar autenticado" on storage.objects
 drop policy if exists "productos: borrar autenticado" on storage.objects;
 create policy "productos: borrar autenticado" on storage.objects
   for delete using (bucket_id = 'productos' and auth.role() = 'authenticated');
+
+-- 2026-07 · PROVEEDORES — lo que le compramos y le debemos a cada proveedor
+create table if not exists proveedores (
+  id uuid primary key default gen_random_uuid(),
+  nombre_proveedor text not null,
+  nombre_distribuidor text,
+  telefono text,
+  ubicacion text,
+  eliminado boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create trigger trg_proveedores_updated_at
+  before update on proveedores
+  for each row execute function set_updated_at();
+
+-- Un solo historial para COMPRA (sube la deuda) y PAGO (la baja), con la
+-- foto de la factura adjunta (igual que las fotos de productos: se sube
+-- redimensionada desde el navegador, no se "lee" el monto automáticamente).
+create table if not exists movimientos_proveedor (
+  id uuid primary key default gen_random_uuid(),
+  id_proveedor uuid not null references proveedores(id) on delete cascade,
+  tipo text not null default 'COMPRA' check (tipo in ('COMPRA', 'PAGO')),
+  fecha timestamptz not null default now(),
+  descripcion text,
+  monto numeric not null default 0,
+  factura_url text,
+  eliminado boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_movimientos_proveedor_proveedor on movimientos_proveedor (id_proveedor);
+
+create trigger trg_movimientos_proveedor_updated_at
+  before update on movimientos_proveedor
+  for each row execute function set_updated_at();
+
+create or replace view vista_saldos_proveedores as
+select
+  p.id,
+  p.nombre_proveedor,
+  p.nombre_distribuidor,
+  p.telefono,
+  p.ubicacion,
+  p.eliminado,
+  coalesce(sum(case when m.tipo = 'COMPRA' then m.monto else 0 end), 0) as total_comprado,
+  coalesce(sum(case when m.tipo = 'PAGO' then m.monto else 0 end), 0) as total_pagado,
+  coalesce(sum(case when m.tipo = 'COMPRA' then m.monto else 0 end), 0)
+    - coalesce(sum(case when m.tipo = 'PAGO' then m.monto else 0 end), 0) as saldo_pendiente
+from proveedores p
+left join movimientos_proveedor m
+  on m.id_proveedor = p.id and m.eliminado = false
+group by p.id;
+
+-- Control de garantías: qué se mandó al proveedor y qué volvió (o no).
+create table if not exists garantias (
+  id uuid primary key default gen_random_uuid(),
+  id_proveedor uuid references proveedores(id) on delete set null,
+  producto text not null,
+  fecha_envio timestamptz not null default now(),
+  fecha_retorno timestamptz,
+  estado text not null default 'ENVIADA' check (estado in ('ENVIADA', 'DEVUELTA', 'RECHAZADA')),
+  notas text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create trigger trg_garantias_updated_at
+  before update on garantias
+  for each row execute function set_updated_at();
+
+alter table proveedores enable row level security;
+alter table movimientos_proveedor enable row level security;
+alter table garantias enable row level security;
+
+create policy "proveedores: acceso autenticado" on proveedores
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "movimientos_proveedor: acceso autenticado" on movimientos_proveedor
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "garantias: acceso autenticado" on garantias
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+alter publication supabase_realtime add table proveedores;
+alter publication supabase_realtime add table movimientos_proveedor;
+alter publication supabase_realtime add table garantias;
+
+-- Storage: fotos de facturas de proveedor (mismo patrón que "productos")
+insert into storage.buckets (id, name, public)
+  values ('facturas-proveedor', 'facturas-proveedor', true)
+  on conflict (id) do nothing;
+
+drop policy if exists "facturas-proveedor: lectura publica" on storage.objects;
+create policy "facturas-proveedor: lectura publica" on storage.objects
+  for select using (bucket_id = 'facturas-proveedor');
+
+drop policy if exists "facturas-proveedor: subir autenticado" on storage.objects;
+create policy "facturas-proveedor: subir autenticado" on storage.objects
+  for insert with check (bucket_id = 'facturas-proveedor' and auth.role() = 'authenticated');
+
+drop policy if exists "facturas-proveedor: actualizar autenticado" on storage.objects;
+create policy "facturas-proveedor: actualizar autenticado" on storage.objects
+  for update using (bucket_id = 'facturas-proveedor' and auth.role() = 'authenticated');
+
+drop policy if exists "facturas-proveedor: borrar autenticado" on storage.objects;
+create policy "facturas-proveedor: borrar autenticado" on storage.objects
+  for delete using (bucket_id = 'facturas-proveedor' and auth.role() = 'authenticated');

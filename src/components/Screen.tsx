@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { ThemeToggle } from './ThemeToggle';
 
 interface ScreenProps {
   title: string;
@@ -18,9 +19,12 @@ export function Screen({ title, backTo, actions, children }: ScreenProps) {
               ←
             </Link>
           )}
-          <h1 className="font-display text-lg uppercase text-white">{title}</h1>
+          <h1 className="font-display text-lg uppercase text-[var(--text-primary)]">{title}</h1>
         </div>
-        <div className="flex items-center gap-3">{actions}</div>
+        <div className="flex items-center gap-3">
+          {actions}
+          <ThemeToggle />
+        </div>
       </header>
       <main className="mx-auto max-w-5xl px-4 py-4">{children}</main>
     </div>

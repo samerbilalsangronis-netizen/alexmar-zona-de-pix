@@ -29,15 +29,18 @@ function redimensionar(archivo: File): Promise<Blob> {
   });
 }
 
-/** Redimensiona y sube una foto de producto a Supabase Storage. Devuelve la URL pública. */
-export async function subirFotoProducto(archivo: File): Promise<string> {
+/** Redimensiona y sube una foto a un bucket público de Supabase Storage. Devuelve la URL pública. */
+async function subirImagen(archivo: File, bucket: string): Promise<string> {
   const blob = await redimensionar(archivo);
   const nombre = `${crypto.randomUUID()}.jpg`;
-  const { error } = await supabase.storage.from('productos').upload(nombre, blob, {
+  const { error } = await supabase.storage.from(bucket).upload(nombre, blob, {
     contentType: 'image/jpeg',
     cacheControl: '31536000',
   });
   if (error) throw error;
-  const { data } = supabase.storage.from('productos').getPublicUrl(nombre);
+  const { data } = supabase.storage.from(bucket).getPublicUrl(nombre);
   return data.publicUrl;
 }
+
+export const subirFotoProducto = (archivo: File): Promise<string> => subirImagen(archivo, 'productos');
+export const subirFotoFacturaProveedor = (archivo: File): Promise<string> => subirImagen(archivo, 'facturas-proveedor');

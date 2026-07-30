@@ -44,7 +44,7 @@ export function Rendimiento() {
   );
 }
 
-function Stat({ label, value, color = 'text-white' }: { label: string; value: string; color?: string }) {
+function Stat({ label, value, color = 'text-[var(--text-primary)]' }: { label: string; value: string; color?: string }) {
   return (
     <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-1)] p-4">
       <p className="text-xs text-[var(--text-muted)]">{label.toUpperCase()}</p>

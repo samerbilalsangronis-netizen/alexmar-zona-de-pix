@@ -37,7 +37,7 @@ export function FacturacionRapida() {
         <Link to="/" className="text-xl text-[var(--accent-2)] hover:opacity-80">
           ←
         </Link>
-        <h1 className="font-display text-lg uppercase text-white">Facturación Rápida</h1>
+        <h1 className="font-display text-lg uppercase text-[var(--text-primary)]">Facturación Rápida</h1>
       </header>
 
       <div className="no-imprimir mx-auto max-w-3xl space-y-4 px-4 py-4">

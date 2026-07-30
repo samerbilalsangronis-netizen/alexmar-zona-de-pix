@@ -81,6 +81,43 @@ export const CATEGORIAS_INVENTARIO = [
   'ACCESORIOS INT-EXT',
 ] as const;
 
+export interface Proveedor {
+  id: string;
+  nombre_proveedor: string;
+  nombre_distribuidor: string | null;
+  telefono: string | null;
+  ubicacion: string | null;
+  eliminado: boolean;
+  total_comprado: number;
+  total_pagado: number;
+  saldo_pendiente: number;
+}
+
+export type TipoMovimientoProveedor = 'COMPRA' | 'PAGO';
+
+export interface MovimientoProveedor {
+  id: string;
+  id_proveedor: string;
+  tipo: TipoMovimientoProveedor;
+  fecha: string;
+  descripcion: string | null;
+  monto: number;
+  factura_url: string | null;
+  eliminado: boolean;
+}
+
+export type EstadoGarantia = 'ENVIADA' | 'DEVUELTA' | 'RECHAZADA';
+
+export interface Garantia {
+  id: string;
+  id_proveedor: string | null;
+  producto: string;
+  fecha_envio: string;
+  fecha_retorno: string | null;
+  estado: EstadoGarantia;
+  notas: string | null;
+}
+
 /** Estatus de cartera según hace cuánto abonó el cliente por última vez. */
 export type EstatusCartera = 'AL_DIA' | 'REVISAR' | 'MORA';
 

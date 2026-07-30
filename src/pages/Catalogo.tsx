@@ -117,7 +117,7 @@ export function Catalogo() {
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{iconoCategoria(cat)}</span>
                   <div>
-                    <p className="font-bold text-white">{cat}</p>
+                    <p className="font-bold text-[var(--text-primary)]">{cat}</p>
                     <p className="text-xs text-[var(--text-muted)]">{info?.total ?? 0} producto(s)</p>
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export function Catalogo() {
                   >
                     {agotado ? 'AGOTADO' : `STOCK ${p.stock_actual}`}
                   </span>
-                  <p className="mt-1 truncate font-bold text-white">{p.nombre_producto}</p>
+                  <p className="mt-1 truncate font-bold text-[var(--text-primary)]">{p.nombre_producto}</p>
                   {buscandoGlobal && <p className="truncate text-xs text-[var(--text-muted)]">{p.categoria_tags}</p>}
                   <p className="mt-0.5 font-display text-sm text-[var(--accent-2)]">{p.pvp ? money(p.pvp) : 'SIN PRECIO'}</p>
                 </div>
@@ -212,7 +212,7 @@ function NuevoProductoForm({ categoriaInicial, onCreado }: { categoriaInicial: s
 
   return (
     <form onSubmit={guardar} className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--surface-1)] p-4">
-      <p className="font-display text-sm text-white">Nuevo producto</p>
+      <p className="font-display text-sm text-[var(--text-primary)]">Nuevo producto</p>
       <div className="mt-3 flex gap-4">
         <ImagenInput url={urlFoto} onSubido={setUrlFoto} />
         <div className="flex-1 space-y-3">

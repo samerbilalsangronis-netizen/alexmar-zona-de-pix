@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { ImagenInput } from './ImagenInput';
+import { Lightbox } from './Lightbox';
 import { CATEGORIAS_INVENTARIO, type Producto } from '../types';
 
 interface ProductoDetalleProps {
@@ -22,6 +23,7 @@ export function ProductoDetalle({ producto, onCerrar, onGuardado }: ProductoDeta
   });
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [ampliar, setAmpliar] = useState(false);
 
   function set<K extends keyof typeof form>(campo: K, valor: (typeof form)[K]) {
     setForm((f) => ({ ...f, [campo]: valor }));
@@ -70,19 +72,28 @@ export function ProductoDetalle({ producto, onCerrar, onGuardado }: ProductoDeta
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between">
-          <p className="font-display text-sm text-white">Editar producto</p>
-          <button onClick={onCerrar} className="text-xl text-[var(--text-muted)] hover:text-white">
+          <p className="font-display text-sm text-[var(--text-primary)]">Editar producto</p>
+          <button onClick={onCerrar} className="text-xl text-[var(--text-muted)] hover:text-[var(--text-primary)]">
             ✕
           </button>
         </div>
 
         <div className="mt-4 flex gap-4">
-          <ImagenInput url={form.url_foto} onSubido={(url) => set('url_foto', url)} />
+          <div className="flex flex-col items-center gap-1">
+            <ImagenInput url={form.url_foto} onSubido={(url) => set('url_foto', url)} />
+            {form.url_foto && (
+              <button type="button" onClick={() => setAmpliar(true)} className="text-[10px] text-[var(--accent-2)] hover:underline">
+                🔍 Ampliar
+              </button>
+            )}
+          </div>
           <div className="flex-1">
             <label className="block text-xs uppercase text-[var(--text-secondary)]">Nombre</label>
             <input value={form.nombre_producto} onChange={(e) => set('nombre_producto', e.target.value)} className="mt-1 w-full" />
           </div>
         </div>
+
+        {ampliar && <Lightbox url={form.url_foto} onCerrar={() => setAmpliar(false)} />}
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <div>

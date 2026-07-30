@@ -72,10 +72,10 @@ export function LineaDetalle({ linea, onCerrar, onGuardado }: LineaDetalleProps)
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between">
-          <p className="font-display text-sm text-white">
+          <p className="font-display text-sm text-[var(--text-primary)]">
             Editar {linea.tipo_linea === 'ABONO' ? 'abono' : linea.tipo_linea === 'TITULO' ? 'vehículo' : 'ítem'}
           </p>
-          <button onClick={onCerrar} className="text-xl text-[var(--text-muted)] hover:text-white">
+          <button onClick={onCerrar} className="text-xl text-[var(--text-muted)] hover:text-[var(--text-primary)]">
             ✕
           </button>
         </div>

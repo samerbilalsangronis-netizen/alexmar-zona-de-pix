@@ -60,7 +60,7 @@ export function IndiceMaestro() {
     >
       <div className="rounded-lg border border-[var(--accent)] bg-[var(--surface-1)] p-4">
         <p className="font-display text-xs text-[var(--accent)]">🔥 TOTAL GENERAL EN LA CALLE</p>
-        <p className="mt-1 font-display text-3xl text-white">{money(totalEnLaCalle)}</p>
+        <p className="mt-1 font-display text-3xl text-[var(--text-primary)]">{money(totalEnLaCalle)}</p>
       </div>
 
       {mostrarForm && <NuevoClienteForm onCreado={() => { setMostrarForm(false); cargar(); }} />}
@@ -90,7 +90,7 @@ export function IndiceMaestro() {
               }`}
             >
               <Link to={`/clientes/${c.id}`} className="min-w-0 flex-1">
-                <p className="font-bold text-white">{c.nombre_cliente}</p>
+                <p className="font-bold text-[var(--text-primary)]">{c.nombre_cliente}</p>
                 {c.telefono && <p className="text-xs text-[var(--text-muted)]">{c.telefono}</p>}
                 <div className="mt-1 flex items-center gap-2">
                   <EstatusBadge estatus={estatus} />
@@ -149,7 +149,7 @@ function NuevoClienteForm({ onCreado }: { onCreado: () => void }) {
 
   return (
     <form onSubmit={guardar} className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--surface-1)] p-4">
-      <p className="font-display text-sm text-white">Nuevo cliente</p>
+      <p className="font-display text-sm text-[var(--text-primary)]">Nuevo cliente</p>
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
         <input placeholder="Nombre *" required value={nombre} onChange={(e) => setNombre(e.target.value)} />
         <input placeholder="Cédula" value={cedula} onChange={(e) => setCedula(e.target.value)} />

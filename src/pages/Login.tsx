@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Navigate } from 'react-router-dom';
 import { supabase, supabaseConfigurado } from '../lib/supabaseClient';
 import { useAuth } from '../lib/AuthContext';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 export function Login() {
   const { sesion } = useAuth();
@@ -22,10 +23,13 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-[var(--bg)] px-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <form onSubmit={entrar} className="w-full max-w-sm rounded-lg border border-[var(--border)] bg-[var(--surface-1)] p-6">
         <p className="font-display text-sm text-[var(--accent)]">MODO JEFE</p>
-        <h1 className="mt-1 font-display text-2xl text-white">Zona De Pix</h1>
+        <h1 className="mt-1 font-display text-2xl text-[var(--text-primary)]">Zona De Pix</h1>
         <p className="mt-1 text-sm text-[var(--text-muted)]">Escudería Alexmar</p>
 
         {!supabaseConfigurado && (
