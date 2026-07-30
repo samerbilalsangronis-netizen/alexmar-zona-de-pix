@@ -62,3 +62,19 @@ select:focus,
 textarea:focus {
   border-color: var(--accent-2);
 }
+
+@media print {
+  @page {
+    margin: 12mm;
+  }
+  .no-imprimir {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+  }
+  .hoja-factura {
+    max-width: none !important;
+    box-shadow: none !important;
+  }
+}

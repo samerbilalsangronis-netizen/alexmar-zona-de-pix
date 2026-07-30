@@ -30,6 +30,13 @@ const ITEMS = [
     titulo: 'MIS NOTAS',
     detalle: 'Pizarra de pendientes, compras y recordatorios',
   },
+  {
+    to: '/facturacion',
+    icono: '🧾',
+    color: 'border-l-[var(--accent-2)]',
+    titulo: 'FACTURACIÓN RÁPIDA',
+    detalle: 'Factura, preforma o cotización para clientes ocasionales',
+  },
 ];
 
 export function Dashboard() {

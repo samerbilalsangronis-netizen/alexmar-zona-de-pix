@@ -8,6 +8,8 @@ import { HojaCliente } from './pages/HojaCliente';
 import { Catalogo } from './pages/Catalogo';
 import { Notas } from './pages/Notas';
 import { Rendimiento } from './pages/Rendimiento';
+import { FacturaCliente } from './pages/FacturaCliente';
+import { FacturacionRapida } from './pages/FacturacionRapida';
 
 function App() {
   return (
@@ -19,9 +21,11 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/clientes" element={<IndiceMaestro />} />
             <Route path="/clientes/:id" element={<HojaCliente />} />
+            <Route path="/clientes/:id/factura" element={<FacturaCliente />} />
             <Route path="/catalogo" element={<Catalogo />} />
             <Route path="/notas" element={<Notas />} />
             <Route path="/rendimiento" element={<Rendimiento />} />
+            <Route path="/facturacion" element={<FacturacionRapida />} />
           </Route>
         </Routes>
       </HashRouter>

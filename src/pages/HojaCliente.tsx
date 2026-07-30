@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Screen } from '../components/Screen';
+import { GrillaItems, filaVacia, type FilaGrid } from '../components/GrillaItems';
 import { supabase } from '../lib/supabaseClient';
 import { money, fecha } from '../lib/format';
 import { METODOS_PAGO, type Cliente, type LineaCuenta } from '../types';
@@ -64,14 +65,22 @@ export function HojaCliente() {
       title={`Hoja Nº ${cliente.factura_n ?? '—'}`}
       backTo="/clientes"
       actions={
-        <button
-          onClick={vaciarCuenta}
-          disabled={lineas.length === 0}
-          className="rounded border border-[var(--warn)] px-3 py-1.5 text-xs font-bold text-[var(--warn)] hover:bg-[var(--warn)]/10 disabled:opacity-30"
-          title="Vaciar cuenta (el cliente sigue existiendo)"
-        >
-          🧹 Vaciar cuenta
-        </button>
+        <>
+          <Link
+            to={`/clientes/${cliente.id}/factura`}
+            className="rounded border border-[var(--accent-2)] px-3 py-1.5 text-xs font-bold text-[var(--accent-2)] hover:bg-[var(--accent-2)]/10"
+          >
+            🧾 Factura
+          </Link>
+          <button
+            onClick={vaciarCuenta}
+            disabled={lineas.length === 0}
+            className="rounded border border-[var(--warn)] px-3 py-1.5 text-xs font-bold text-[var(--warn)] hover:bg-[var(--warn)]/10 disabled:opacity-30"
+            title="Vaciar cuenta (el cliente sigue existiendo)"
+          >
+            🧹 Vaciar cuenta
+          </button>
+        </>
       }
     >
       <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-1)] p-4">
@@ -156,73 +165,11 @@ function Libro({ lineas }: { lineas: LineaCuenta[] }) {
   );
 }
 
-interface FilaGrid {
-  cantidad: string;
-  descripcion: string;
-  precio: string;
-}
-
-function filaVacia(): FilaGrid {
-  return { cantidad: '1', descripcion: '', precio: '' };
-}
-
 function CargaCargos({ idCliente, onGuardado }: { idCliente: string; onGuardado: () => void }) {
   const [vehiculo, setVehiculo] = useState('');
   const [filas, setFilas] = useState<FilaGrid[]>(() => Array.from({ length: FILAS_INICIALES }, filaVacia));
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const refs = useRef<(HTMLInputElement | null)[][]>([]);
-
-  function actualizar(fila: number, campo: keyof FilaGrid, valor: string) {
-    setFilas((prev) => prev.map((f, i) => (i === fila ? { ...f, [campo]: valor } : f)));
-  }
-
-  function moverFoco(fila: number, col: number) {
-    const destino = refs.current[fila]?.[col];
-    destino?.focus();
-    destino?.select();
-  }
-
-  function alPresionarTecla(e: KeyboardEvent<HTMLInputElement>, fila: number, col: number) {
-    const totalFilas = filas.length;
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      if (fila + 1 < totalFilas) moverFoco(fila + 1, col);
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      if (fila - 1 >= 0) moverFoco(fila - 1, col);
-    } else if (e.key === 'ArrowRight') {
-      const input = e.currentTarget;
-      if (input.selectionStart === input.value.length) {
-        if (col + 1 < 3) {
-          e.preventDefault();
-          moverFoco(fila, col + 1);
-        } else if (fila + 1 < totalFilas) {
-          e.preventDefault();
-          moverFoco(fila + 1, 0);
-        }
-      }
-    } else if (e.key === 'ArrowLeft') {
-      const input = e.currentTarget;
-      if (input.selectionStart === 0) {
-        if (col - 1 >= 0) {
-          e.preventDefault();
-          moverFoco(fila, col - 1);
-        } else if (fila - 1 >= 0) {
-          e.preventDefault();
-          moverFoco(fila - 1, 2);
-        }
-      }
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (fila + 1 < totalFilas) moverFoco(fila + 1, col);
-      else agregarFilas();
-    }
-  }
-
-  function agregarFilas() {
-    setFilas((prev) => [...prev, ...Array.from({ length: FILAS_INICIALES }, filaVacia)]);
-  }
 
   const filasCompletas = useMemo(
     () => filas.filter((f) => f.descripcion.trim() && Number(f.precio) >= 0 && f.precio !== ''),
@@ -291,68 +238,7 @@ function CargaCargos({ idCliente, onGuardado }: { idCliente: string; onGuardado:
         className="mt-1 w-full"
       />
 
-      <div className="mt-3 overflow-x-auto">
-        <table className="w-full min-w-[420px] border-separate border-spacing-y-1 text-sm">
-          <thead>
-            <tr className="text-left text-xs text-[var(--text-muted)]">
-              <th className="w-16 px-1 font-normal">Cant.</th>
-              <th className="px-1 font-normal">Producto o servicio</th>
-              <th className="w-28 px-1 font-normal">Precio unit.</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filas.map((f, fila) => {
-              if (!refs.current[fila]) refs.current[fila] = [null, null, null];
-              return (
-                <tr key={fila}>
-                  <td className="px-1">
-                    <input
-                      ref={(el) => {
-                        refs.current[fila][0] = el;
-                      }}
-                      value={f.cantidad}
-                      onChange={(e) => actualizar(fila, 'cantidad', e.target.value)}
-                      onKeyDown={(e) => alPresionarTecla(e, fila, 0)}
-                      type="number"
-                      min="0"
-                      className="w-full"
-                    />
-                  </td>
-                  <td className="px-1">
-                    <input
-                      ref={(el) => {
-                        refs.current[fila][1] = el;
-                      }}
-                      value={f.descripcion}
-                      onChange={(e) => actualizar(fila, 'descripcion', e.target.value)}
-                      onKeyDown={(e) => alPresionarTecla(e, fila, 1)}
-                      className="w-full"
-                    />
-                  </td>
-                  <td className="px-1">
-                    <input
-                      ref={(el) => {
-                        refs.current[fila][2] = el;
-                      }}
-                      value={f.precio}
-                      onChange={(e) => actualizar(fila, 'precio', e.target.value)}
-                      onKeyDown={(e) => alPresionarTecla(e, fila, 2)}
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      className="w-full"
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      <button type="button" onClick={agregarFilas} className="mt-2 text-xs text-[var(--accent-2)] hover:underline">
-        + más filas
-      </button>
+      <GrillaItems filas={filas} onCambiar={setFilas} filasPorTanda={FILAS_INICIALES} />
 
       {error && <p className="mt-2 text-sm text-[var(--bad)]">{error}</p>}
       <button disabled={guardando} className="mt-3 w-full rounded bg-white py-2 text-sm font-bold text-black disabled:opacity-50">
