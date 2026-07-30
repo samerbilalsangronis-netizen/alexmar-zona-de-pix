@@ -1,43 +1,61 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { NEGOCIO } from '../lib/negocio';
+import { compartirFacturaPdf, type DatosFacturaPdf } from '../lib/generarPdf';
 
 interface FacturaLayoutProps {
   backTo: string;
   etiqueta: string; // "ESTADO DE CUENTA" | "PREFORMA" | "COTIZACIÓN" | "FACTURA"
   numero?: string;
+  datosPdf: DatosFacturaPdf;
   children: ReactNode;
 }
 
-export function FacturaLayout({ backTo, etiqueta, numero, children }: FacturaLayoutProps) {
+export function FacturaLayout({ backTo, etiqueta, numero, datosPdf, children }: FacturaLayoutProps) {
   const fechaEmision = new Date().toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const [generando, setGenerando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function compartir() {
+    setGenerando(true);
+    setError(null);
+    try {
+      const nombreArchivo = `${etiqueta.replace(/\s+/g, '_')}${numero ? `_${numero}` : ''}.pdf`;
+      const resultado = await compartirFacturaPdf(datosPdf, nombreArchivo);
+      if (resultado === 'descargado') {
+        setError('Tu navegador no soporta compartir directo — se descargó el PDF, adjuntalo a mano en WhatsApp.');
+      }
+    } catch (err) {
+      // El usuario cancelando el share sheet también cae acá — no es un error real.
+      if (err instanceof Error && err.name !== 'AbortError') {
+        setError('No se pudo generar el PDF: ' + err.message);
+      }
+    } finally {
+      setGenerando(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#e9e9e9]">
-      <div className="no-imprimir sticky top-0 z-10 flex items-center justify-between border-b border-black/10 bg-white px-4 py-3">
-        <Link to={backTo} className="text-sm font-bold text-black hover:opacity-70">
-          ← Volver
-        </Link>
-        <div className="flex gap-2">
-          <button
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: `${etiqueta}${numero ? ` Nº ${numero}` : ''} — ${NEGOCIO.nombre}`,
-                  text: `${etiqueta}${numero ? ` Nº ${numero}` : ''} de ${NEGOCIO.nombre}. Usá "Imprimir → Guardar como PDF" para adjuntarla acá.`,
-                });
-              } else {
-                window.print();
-              }
-            }}
-            className="rounded border border-black/20 px-3 py-1.5 text-sm font-bold text-black hover:bg-black/5"
-          >
-            📤 Compartir
-          </button>
-          <button onClick={() => window.print()} className="rounded bg-black px-3 py-1.5 text-sm font-bold text-white hover:opacity-80">
-            🖨 Imprimir / Guardar PDF
-          </button>
+      <div className="no-imprimir sticky top-0 z-10 border-b border-black/10 bg-white px-4 py-3">
+        <div className="flex items-center justify-between">
+          <Link to={backTo} className="text-sm font-bold text-black hover:opacity-70">
+            ← Volver
+          </Link>
+          <div className="flex gap-2">
+            <button
+              onClick={compartir}
+              disabled={generando}
+              className="rounded border border-black/20 px-3 py-1.5 text-sm font-bold text-black hover:bg-black/5 disabled:opacity-50"
+            >
+              {generando ? 'Generando…' : '📤 Compartir PDF'}
+            </button>
+            <button onClick={() => window.print()} className="rounded bg-black px-3 py-1.5 text-sm font-bold text-white hover:opacity-80">
+              🖨 Imprimir
+            </button>
+          </div>
         </div>
+        {error && <p className="mt-2 text-right text-xs text-[#b91c1c]">{error}</p>}
       </div>
 
       <div className="hoja-factura mx-auto max-w-3xl bg-white text-black shadow-lg print:shadow-none">

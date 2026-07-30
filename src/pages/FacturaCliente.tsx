@@ -41,7 +41,23 @@ export function FacturaCliente() {
   }));
 
   return (
-    <FacturaLayout backTo={`/clientes/${cliente.id}`} etiqueta="ESTADO DE CUENTA" numero={cliente.factura_n ?? undefined}>
+    <FacturaLayout
+      backTo={`/clientes/${cliente.id}`}
+      etiqueta="ESTADO DE CUENTA"
+      numero={cliente.factura_n ?? undefined}
+      datosPdf={{
+        etiqueta: 'ESTADO DE CUENTA',
+        numero: cliente.factura_n ?? undefined,
+        clienteNombre: cliente.nombre_cliente,
+        clienteContacto: cliente.telefono ? `Tel: ${cliente.telefono}` : '—',
+        items,
+        totales: [
+          { etiqueta: 'Total consumido', valor: cliente.total_cargado },
+          { etiqueta: 'Total abonado', valor: cliente.total_abonado, prefijo: '− ' },
+          { etiqueta: 'Saldo pendiente', valor: cliente.saldo_pendiente, destacado: true },
+        ],
+      }}
+    >
       <div className="mb-4 grid grid-cols-2 gap-4 rounded border border-black/10 p-3">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-wide text-black/50">Cliente</p>

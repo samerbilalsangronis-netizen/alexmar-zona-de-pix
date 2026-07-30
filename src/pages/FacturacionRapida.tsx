@@ -76,7 +76,19 @@ export function FacturacionRapida() {
         )}
       </div>
 
-      <FacturaLayout backTo="/" etiqueta={etiqueta} numero={numero || undefined}>
+      <FacturaLayout
+        backTo="/"
+        etiqueta={etiqueta}
+        numero={numero || undefined}
+        datosPdf={{
+          etiqueta,
+          numero: numero || undefined,
+          clienteNombre: nombreCliente,
+          clienteContacto: telefonoCliente ? `Tel: ${telefonoCliente}` : '—',
+          items,
+          totales: [{ etiqueta: 'Total', valor: total, destacado: true }],
+        }}
+      >
         <div className="mb-4 grid grid-cols-2 gap-4 rounded border border-black/10 p-3">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-wide text-black/50">Cliente</p>
