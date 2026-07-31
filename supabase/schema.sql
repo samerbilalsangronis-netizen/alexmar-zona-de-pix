@@ -27,6 +27,7 @@ create table if not exists perfiles (
   updated_at timestamptz not null default now()
 );
 
+drop trigger if exists trg_perfiles_updated_at on perfiles;
 create trigger trg_perfiles_updated_at
   before update on perfiles
   for each row execute function set_updated_at();
@@ -68,6 +69,7 @@ create table if not exists clientes (
 create index if not exists idx_clientes_nombre on clientes (nombre_cliente);
 create index if not exists idx_clientes_eliminado on clientes (eliminado);
 
+drop trigger if exists trg_clientes_updated_at on clientes;
 create trigger trg_clientes_updated_at
   before update on clientes
   for each row execute function set_updated_at();
@@ -94,6 +96,7 @@ create table if not exists inventario (
 create index if not exists idx_inventario_categoria on inventario (categoria_tags);
 create index if not exists idx_inventario_eliminado on inventario (eliminado);
 
+drop trigger if exists trg_inventario_updated_at on inventario;
 create trigger trg_inventario_updated_at
   before update on inventario
   for each row execute function set_updated_at();
@@ -121,6 +124,7 @@ create table if not exists detalle_cuentas (
 create index if not exists idx_detalle_cliente on detalle_cuentas (id_cliente);
 create index if not exists idx_detalle_eliminado on detalle_cuentas (eliminado);
 
+drop trigger if exists trg_detalle_updated_at on detalle_cuentas;
 create trigger trg_detalle_updated_at
   before update on detalle_cuentas
   for each row execute function set_updated_at();
@@ -138,6 +142,7 @@ create table if not exists notas (
   updated_at timestamptz not null default now()
 );
 
+drop trigger if exists trg_notas_updated_at on notas;
 create trigger trg_notas_updated_at
   before update on notas
   for each row execute function set_updated_at();
@@ -260,6 +265,7 @@ create table if not exists proveedores (
   updated_at timestamptz not null default now()
 );
 
+drop trigger if exists trg_proveedores_updated_at on proveedores;
 create trigger trg_proveedores_updated_at
   before update on proveedores
   for each row execute function set_updated_at();
@@ -282,6 +288,7 @@ create table if not exists movimientos_proveedor (
 
 create index if not exists idx_movimientos_proveedor_proveedor on movimientos_proveedor (id_proveedor);
 
+drop trigger if exists trg_movimientos_proveedor_updated_at on movimientos_proveedor;
 create trigger trg_movimientos_proveedor_updated_at
   before update on movimientos_proveedor
   for each row execute function set_updated_at();
@@ -316,6 +323,7 @@ create table if not exists garantias (
   updated_at timestamptz not null default now()
 );
 
+drop trigger if exists trg_garantias_updated_at on garantias;
 create trigger trg_garantias_updated_at
   before update on garantias
   for each row execute function set_updated_at();
@@ -375,6 +383,7 @@ create table if not exists fusibleras (
 
 create index if not exists idx_fusibleras_marca_modelo on fusibleras (marca, modelo);
 
+drop trigger if exists trg_fusibleras_updated_at on fusibleras;
 create trigger trg_fusibleras_updated_at
   before update on fusibleras
   for each row execute function set_updated_at();
@@ -397,6 +406,7 @@ create table if not exists fusibles (
 
 create index if not exists idx_fusibles_fusiblera on fusibles (id_fusiblera);
 
+drop trigger if exists trg_fusibles_updated_at on fusibles;
 create trigger trg_fusibles_updated_at
   before update on fusibles
   for each row execute function set_updated_at();
