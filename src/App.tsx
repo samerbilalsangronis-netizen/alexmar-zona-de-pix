@@ -14,6 +14,8 @@ import { FacturacionRapida } from './pages/FacturacionRapida';
 import { Proveedores } from './pages/Proveedores';
 import { HojaProveedor } from './pages/HojaProveedor';
 import { Garantias } from './pages/Garantias';
+import { Fusibleras } from './pages/Fusibleras';
+import { FusibleraDetalle } from './pages/FusibleraDetalle';
 
 function App() {
   return (
@@ -34,6 +36,8 @@ function App() {
               <Route path="/proveedores" element={<Proveedores />} />
               <Route path="/proveedores/:id" element={<HojaProveedor />} />
               <Route path="/garantias" element={<Garantias />} />
+              <Route path="/fusibleras" element={<Fusibleras />} />
+              <Route path="/fusibleras/:id" element={<FusibleraDetalle />} />
             </Route>
           </Routes>
         </HashRouter>

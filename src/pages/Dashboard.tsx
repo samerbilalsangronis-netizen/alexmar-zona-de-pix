@@ -45,6 +45,13 @@ const ITEMS = [
     titulo: 'PROVEEDORES',
     detalle: 'Compras, pagos, facturas y garantías',
   },
+  {
+    to: '/fusibleras',
+    icono: '🔌',
+    color: 'border-l-[var(--good)]',
+    titulo: 'FUSIBLERAS',
+    detalle: 'Diagramas de caja de fusibles por vehículo',
+  },
 ];
 
 export function Dashboard() {

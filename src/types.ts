@@ -118,6 +118,28 @@ export interface Garantia {
   notas: string | null;
 }
 
+export interface Fusiblera {
+  id: string;
+  marca: string;
+  modelo: string;
+  anio_desde: number | null;
+  anio_hasta: number | null;
+  ubicacion: string | null;
+  imagen_url: string;
+  eliminado: boolean;
+}
+
+export interface Fusible {
+  id: string;
+  id_fusiblera: string;
+  numero: string;
+  funcion: string;
+  amperaje: string | null;
+  pos_x: number;
+  pos_y: number;
+  eliminado: boolean;
+}
+
 /** Estatus de cartera según hace cuánto abonó el cliente por última vez. */
 export type EstatusCartera = 'AL_DIA' | 'REVISAR' | 'MORA';
 

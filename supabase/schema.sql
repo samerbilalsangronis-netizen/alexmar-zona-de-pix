@@ -355,3 +355,80 @@ create policy "facturas-proveedor: actualizar autenticado" on storage.objects
 drop policy if exists "facturas-proveedor: borrar autenticado" on storage.objects;
 create policy "facturas-proveedor: borrar autenticado" on storage.objects
   for delete using (bucket_id = 'facturas-proveedor' and auth.role() = 'authenticated');
+
+-- 2026-07 · FUSIBLERAS — diagramas de caja de fusibles por vehículo, solo
+-- de consulta. Los diagramas/fusibles los carga el dueño del negocio (vía
+-- un script puntual con la service_role key), no hay pantalla de carga en
+-- la app todavía.
+create table if not exists fusibleras (
+  id uuid primary key default gen_random_uuid(),
+  marca text not null,
+  modelo text not null,
+  anio_desde smallint,
+  anio_hasta smallint,
+  ubicacion text,
+  imagen_url text not null,
+  eliminado boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_fusibleras_marca_modelo on fusibleras (marca, modelo);
+
+create trigger trg_fusibleras_updated_at
+  before update on fusibleras
+  for each row execute function set_updated_at();
+
+-- Un punto tocable por fusible sobre el diagrama. pos_x/pos_y son
+-- porcentaje (0-100) relativo al ancho/alto de la imagen, para que el
+-- punto quede bien ubicado sin importar el tamaño en que se renderice.
+create table if not exists fusibles (
+  id uuid primary key default gen_random_uuid(),
+  id_fusiblera uuid not null references fusibleras(id) on delete cascade,
+  numero text not null,
+  funcion text not null,
+  amperaje text,
+  pos_x numeric(5, 2) not null,
+  pos_y numeric(5, 2) not null,
+  eliminado boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_fusibles_fusiblera on fusibles (id_fusiblera);
+
+create trigger trg_fusibles_updated_at
+  before update on fusibles
+  for each row execute function set_updated_at();
+
+alter table fusibleras enable row level security;
+alter table fusibles enable row level security;
+
+create policy "fusibleras: acceso autenticado" on fusibleras
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "fusibles: acceso autenticado" on fusibles
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+
+alter publication supabase_realtime add table fusibleras;
+alter publication supabase_realtime add table fusibles;
+
+-- Storage: fotos de diagramas de fusibleras (mismo patrón que "productos")
+insert into storage.buckets (id, name, public)
+  values ('fusibleras', 'fusibleras', true)
+  on conflict (id) do nothing;
+
+drop policy if exists "fusibleras: lectura publica" on storage.objects;
+create policy "fusibleras: lectura publica" on storage.objects
+  for select using (bucket_id = 'fusibleras');
+
+drop policy if exists "fusibleras: subir autenticado" on storage.objects;
+create policy "fusibleras: subir autenticado" on storage.objects
+  for insert with check (bucket_id = 'fusibleras' and auth.role() = 'authenticated');
+
+drop policy if exists "fusibleras: actualizar autenticado" on storage.objects;
+create policy "fusibleras: actualizar autenticado" on storage.objects
+  for update using (bucket_id = 'fusibleras' and auth.role() = 'authenticated');
+
+drop policy if exists "fusibleras: borrar autenticado" on storage.objects;
+create policy "fusibleras: borrar autenticado" on storage.objects
+  for delete using (bucket_id = 'fusibleras' and auth.role() = 'authenticated');
