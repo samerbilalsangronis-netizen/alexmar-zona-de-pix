@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Screen } from '../components/Screen';
 import { GrillaItems, filaVacia, type FilaGrid } from '../components/GrillaItems';
 import { LineaDetalle } from '../components/LineaDetalle';
+import { ClienteDetalle } from '../components/ClienteDetalle';
 import { supabase } from '../lib/supabaseClient';
 import { money, fecha } from '../lib/format';
 import { METODOS_PAGO, type Cliente, type LineaCuenta } from '../types';
@@ -16,6 +17,7 @@ export function HojaCliente() {
   const [lineas, setLineas] = useState<LineaCuenta[]>([]);
   const [cargando, setCargando] = useState(true);
   const [lineaEditar, setLineaEditar] = useState<LineaCuenta | null>(null);
+  const [editandoCliente, setEditandoCliente] = useState(false);
 
   async function cargar() {
     if (!id) return;
@@ -92,23 +94,34 @@ export function HojaCliente() {
             <p className="text-sm text-[var(--text-muted)]">
               {cliente.telefono ?? 'sin teléfono'} {cliente.cedula ? `· C.I. ${cliente.cedula}` : ''}
             </p>
+            {cliente.direccion && <p className="text-xs text-[var(--text-muted)]">{cliente.direccion}</p>}
           </div>
-          <button
-            onClick={async () => {
-              if (!confirm(`¿Quitar a "${cliente.nombre_cliente}" del Índice Maestro?`)) return;
-              await supabase.from('clientes').update({ eliminado: true }).eq('id', cliente.id);
-              navigate('/clientes');
-            }}
-            className="text-xs text-[var(--text-muted)] hover:text-[var(--bad)]"
-          >
-            🗑 Quitar cliente
-          </button>
+          <div className="flex shrink-0 items-center gap-3">
+            <button
+              onClick={() => setEditandoCliente(true)}
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+              title="Editar datos del cliente"
+            >
+              ✏️ Editar
+            </button>
+            <button
+              onClick={async () => {
+                if (!confirm(`¿Quitar a "${cliente.nombre_cliente}" del Índice Maestro?`)) return;
+                await supabase.from('clientes').update({ eliminado: true }).eq('id', cliente.id);
+                navigate('/clientes');
+              }}
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--bad)]"
+            >
+              🗑 Quitar cliente
+            </button>
+          </div>
         </div>
       </div>
 
       <Libro lineas={lineas} onEditar={setLineaEditar} onCambio={cargar} />
 
       {lineaEditar && <LineaDetalle linea={lineaEditar} onCerrar={() => setLineaEditar(null)} onGuardado={cargar} />}
+      {editandoCliente && <ClienteDetalle cliente={cliente} onCerrar={() => setEditandoCliente(false)} onGuardado={cargar} />}
 
       <div className="mt-4 grid grid-cols-3 gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-1)] p-4 text-center">
         <div>
