@@ -82,7 +82,11 @@ export function ProductoDetalle({ producto, onCerrar, onGuardado }: ProductoDeta
           <div className="flex flex-col items-center gap-1">
             <ImagenInput url={form.url_foto} onSubido={(url) => set('url_foto', url)} />
             {form.url_foto && (
-              <button type="button" onClick={() => setAmpliar(true)} className="text-[10px] text-[var(--accent-2)] hover:underline">
+              <button
+                type="button"
+                onClick={() => setAmpliar(true)}
+                className="rounded border border-[var(--accent-2)] px-2 py-1 text-xs text-[var(--accent-2)] hover:bg-[var(--accent-2)]/10"
+              >
                 🔍 Ampliar
               </button>
             )}

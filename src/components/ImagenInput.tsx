@@ -7,7 +7,7 @@ interface ImagenInputProps {
   subir?: (archivo: File) => Promise<string>;
 }
 
-/** Botón de foto: en el celular abre cámara/galería directo (input file nativo). */
+/** Botón de foto: abre el selector nativo del celular con opción de cámara Y galería. */
 export function ImagenInput({ url, onSubido, subir = subirFotoProducto }: ImagenInputProps) {
   const ref = useRef<HTMLInputElement>(null);
   const [subiendo, setSubiendo] = useState(false);
@@ -31,7 +31,7 @@ export function ImagenInput({ url, onSubido, subir = subirFotoProducto }: Imagen
 
   return (
     <div>
-      <input ref={ref} type="file" accept="image/*" capture="environment" className="hidden" onChange={alElegir} />
+      <input ref={ref} type="file" accept="image/*" className="hidden" onChange={alElegir} />
       <button
         type="button"
         onClick={() => ref.current?.click()}

@@ -64,7 +64,11 @@ export function MovimientoProveedorDetalle({ movimiento, onCerrar, onGuardado }:
           <div className="flex flex-col items-center gap-1">
             <ImagenInput url={facturaUrl} onSubido={setFacturaUrl} subir={subirFotoFacturaProveedor} />
             {facturaUrl && (
-              <button type="button" onClick={() => setAmpliar(true)} className="text-[10px] text-[var(--accent-2)] hover:underline">
+              <button
+                type="button"
+                onClick={() => setAmpliar(true)}
+                className="rounded border border-[var(--accent-2)] px-2 py-1 text-xs text-[var(--accent-2)] hover:bg-[var(--accent-2)]/10"
+              >
                 🔍 Ampliar
               </button>
             )}
