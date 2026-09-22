@@ -79,6 +79,7 @@ export const CATEGORIAS_INVENTARIO = [
   'SISTEMA ELECTRICO',
   'CUIDADO Y ESTETICA',
   'ACCESORIOS INT-EXT',
+  'PLAST INNOVA',
 ] as const;
 
 export interface Proveedor {
