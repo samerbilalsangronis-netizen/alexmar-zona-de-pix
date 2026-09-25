@@ -442,3 +442,25 @@ create policy "fusibleras: actualizar autenticado" on storage.objects
 drop policy if exists "fusibleras: borrar autenticado" on storage.objects;
 create policy "fusibleras: borrar autenticado" on storage.objects
   for delete using (bucket_id = 'fusibleras' and auth.role() = 'authenticated');
+
+-- 2026-09 · Vista pública de solo lectura del inventario, para JARVIS
+-- (el asistente que consulta stock/precio por WhatsApp/CLI sin login).
+-- La tabla `inventario` exige auth.role() = 'authenticated' para leer,
+-- así que con la anon key sola (sin sesión) cualquier select devuelve
+-- vacío. Esta vista expone SOLO las columnas que un cliente puede ver
+-- (nunca `costo`, el precio de compra) y se le da permiso de lectura al
+-- rol `anon`. Una vista sin `security_invoker` corre con los permisos
+-- de quien la creó (el dueño del esquema), por eso puede leer la tabla
+-- protegida por RLS aunque quien consulta la vista sea anónimo.
+create or replace view inventario_publico as
+select
+  nombre_producto,
+  categoria_tags,
+  compatibilidad_vehiculos,
+  stock_actual,
+  stock_minimo,
+  pvp
+from inventario
+where eliminado = false;
+
+grant select on inventario_publico to anon, authenticated;
