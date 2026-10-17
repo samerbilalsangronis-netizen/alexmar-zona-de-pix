@@ -32,9 +32,9 @@ S = [  # name, src, start, dur, overlay, mode, speed
  ('07', 'w181', 4.8, 2.6, '07', 'V', 1),
  ('08', 'w167', 9.0, 2.6, '08', 'V', 1),
  ('09', 'w165', 10.3, 2.6, '09', 'V', 1),
- ('10', 'w167', 19.0, 3.2, '10', 'V', 1),
- ('12', 'w181', 13.0, 2.6, 'base', 'V', 1),
- ('13', 'w181', 16.0, 5.2, '12', 'V', 1),
+ ('10', 'w167', 18.8, 4.2, '10', 'V', 0.8),
+ ('12', 'w181', 15.8, 3.0, 'base', 'V', 0.7),
+ ('13', 'w181', 18.2, 5.2, '12', 'V', 1),
 ]
 import sys
 if 'nosegs' not in sys.argv:
@@ -44,9 +44,9 @@ run(['ffmpeg', '-v', 'error', '-y', '-loop', '1', '-i', 'ov/cierre.jpg', '-t', '
      "scale=2160:3840,zoompan=z='min(1+0.0010*on,1.08)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30,format=yuv420p",
      '-c:v', 'libx264', '-preset', 'medium', '-crf', '18', '-r', '30', 'seg/14.mp4'])
 
-order = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14']
+order = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '12', '11', '13', '14']
 dur = {n: float(subprocess.run(['ffprobe','-v','error','-show_entries','format=duration','-of','csv=p=0',f'seg/{n}.mp4'],capture_output=True,text=True).stdout) for n in ['01','02','03','04','05','06','07','08','09','10','11','12','13','14']}
-tr = ['fadewhite', 'slideleft', 'smoothup', 'zoomin', 'fadeblack', 'slideleft', 'circleopen', 'smoothleft', 'slideup', 'fadewhite', 'fadeblack', 'smoothup', 'fade']
+tr = ['fadewhite', 'slideleft', 'smoothup', 'zoomin', 'fadeblack', 'slideleft', 'circleopen', 'smoothleft', 'slideup', 'fade', 'fadewhite', 'fadeblack', 'fade']
 T = 0.35
 inp = []; f = []; acc = dur[order[0]]; prev = '[0:v]'
 for n in order: inp += ['-i', f'seg/{n}.mp4']
