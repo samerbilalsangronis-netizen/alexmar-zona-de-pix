@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw, ImageFilter, ImageEnhance
-src = open('/home/claude/scorpion/overlays.py').read().split("card('01'")[0].replace("O = '/home/claude/scorpion/ov/'", "O = '/home/claude/historias/out/'")
+src = open('/home/claude/alexmar-zona-de-pix/plantillas/overlays_reel.py').read().split("card('01'")[0].replace("O = '/home/claude/scorpion/ov/'", "O = '/home/claude/historias/out/'")
 exec(src)
 FR = '/home/claude/historias/fr/'
 

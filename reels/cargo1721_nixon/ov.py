@@ -1,4 +1,4 @@
-src=open('/home/claude/scorpion/overlays.py').read().split("card('01'")[0].replace("O = '/home/claude/scorpion/ov/'","O = '/home/claude/cargo/ov/'")
+src=open('/home/claude/alexmar-zona-de-pix/plantillas/overlays_reel.py').read().split("card('01'")[0].replace("O = '/home/claude/scorpion/ov/'","O = '/home/claude/cargo/ov/'")
 exec(src)
 base().save(O+'base.png')
 card('01','FORD CARGO 1721','ILUMINACIÓN','LED COMPLETA',y=1120,size=124)

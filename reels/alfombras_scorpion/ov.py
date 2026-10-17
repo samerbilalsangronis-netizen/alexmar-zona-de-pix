@@ -1,4 +1,4 @@
-src=open('/home/claude/scorpion/overlays.py').read().split("card('01'")[0].replace("O = '/home/claude/scorpion/ov/'","O = '/home/claude/alfombras/ov/'")
+src=open('/home/claude/alexmar-zona-de-pix/plantillas/overlays_reel.py').read().split("card('01'")[0].replace("O = '/home/claude/scorpion/ov/'","O = '/home/claude/alfombras/ov/'")
 exec(src)
 base().save(O+'base.png')
 card('01','SCORPION','ALFOMBRAS','TIPO BANDEJA',y=1150,size=124,sub='Protección con estilo para tu carro')
