@@ -1,0 +1,35 @@
+src=open('/home/claude/scorpion/overlays.py').read().split("card('01'")[0].replace("O = '/home/claude/scorpion/ov/'","O = '/home/claude/cargo/ov/'")
+exec(src)
+base().save(O+'base.png')
+card('01','FORD CARGO 1721','ILUMINACIÓN','LED COMPLETA',y=1120,size=124)
+card('02','SEDE PUEBLO LLANO','MANOS A','LA OBRA',size=124)
+card('03','INSTALACIÓN','MÓDULOS LED','EN LOS PULMONES',size=106)
+card('04','INSTALACIÓN','EXPLORADORAS','Y BARRA LED',y=1330,size=112)
+card('05','LED','CINTA LED EN','CACHUCHA Y CAPÓ',size=104)
+card('06','LED DE POTENCIA','ALTA','Y BAJA',size=128)
+card('07','LED','EXPLORADORAS Y','LUCES DE PARRILLA',size=100)
+card('08','LED DE POTENCIA','BOMBILLOS','EN LOS CRUCES',size=112)
+card('09','INSTALACIÓN','LUCES DE','PLATAFORMA',size=124)
+card('10','COLA COMPLETA','STOP, CRUCES Y','SEMÁFOROS LED',size=104)
+card('11','SEDE PUEBLO LLANO','NUESTRO','FIEL CLIENTE',sub='Nixon · Ford Cargo 1721',size=124)
+c=base(); shade(c,960,1600,190); d=ImageDraw.Draw(c); y=1010
+for t,col,sz in [('SI UN CLIENTE VUELVE,',CR,98),('HICISTE LAS COSAS BIEN.',CR,98),('SI TRAE A OTRO,',ORL,108),('HICISTE MAGIA.',OR,138)]:
+    f=F('Anton.ttf',sz)
+    while d.textlength(t,font=f)>W-120: sz-=4; f=F('Anton.ttf',sz)
+    tc(d,W/2,y,t,f,col,4,BK); y+=int(sz*1.15)+(28 if t.endswith('BIEN.') else 0)
+c.save(O+'12.png')
+from PIL import ImageFilter
+c=Image.open('/home/claude/cargo/src/foto.jpg').convert('RGBA').resize((W,H)).filter(ImageFilter.GaussianBlur(7))
+c=Image.alpha_composite(c,Image.new('RGBA',(W,H),BK+(210,))); c.alpha_composite(WM); d=ImageDraw.Draw(c)
+lg=LOGO.resize((int(LOGO.width*400/LOGO.height),400),Image.LANCZOS); c.alpha_composite(lg,((W-lg.width)//2,170)); d=ImageDraw.Draw(c)
+tc(d,W/2,630,'Autoperiquitos y Rotulados',F('Mont900.ttf',46),CR)
+tc(d,W/2,695,'ALEXMAR',F('Anton.ttf',196),OR,4,BK)
+fp=F('Anton.ttf',96); ph='0416-676 83 93'; pw=d.textlength(ph,font=fp)
+d.rounded_rectangle(((W-pw)/2-56,965,(W+pw)/2+56,1105),radius=70,fill=OR); tc(d,W/2,977,ph,fp,BK)
+pill(d,W/2,1160,'SEDE PUEBLO LLANO',F('Mont900.ttf',36),fill=CR)
+y=1250
+for t,f,col in [('C-9, sector La Curva de Los Luises',F('Mont700.ttf',38),CR),('Lunes a sábado · 8 am a 6 pm',F('Mont900.ttf',42),ORL),('También en Tovar',F('Mont700.ttf',38),CR)]:
+    tc(d,W/2,y,t,f,col); y+=66
+tc(d,W/2,y+24,'@autoalexmar_car',F('Mont900.ttf',46),ORL)
+c.convert('RGB').save(O+'cierre.jpg',quality=94)
+print('ok')
