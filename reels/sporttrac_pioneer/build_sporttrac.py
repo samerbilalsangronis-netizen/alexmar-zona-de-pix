@@ -27,15 +27,18 @@ def spot(name, ox, oy, r=360, dark=140):
 VF = f"{V}/v122506.mp4"; VL = f"{V}/v122350.mp4"; VR = f"{V}/v122405.mp4"
 VB = f"{V}/v161611.mp4"; VP = f"{V}/v161635.mp4"
 # ritmo: cortes cortos (1.6-2.4 s), transiciones rápidas (0.15-0.25 s) y "golpe" de zoom al inicio de cada toma
-plan = [("h0", 1.9, None, 0), ("c1", 2.1, "fadewhite", 0.15), ("c2", 2.0, "zoomin", 0.25),
-        ("c2b", 1.6, "hlslice", 0.2), ("c3", 2.2, "radial", 0.25), ("c4", 1.8, "fadewhite", 0.15),
-        ("c5", 2.1, "zoomin", 0.25), ("c6", 2.4, "smoothleft", 0.25), ("c7", 2.2, "hblur", 0.25),
-        ("c8", 4.2, "fadeblack", 0.4)]
+plan = [("h0", 1.9, None, 0), ("c1", 2.0, "fadewhite", 0.15), ("w1", 1.7, "hlslice", 0.2),
+        ("w2", 1.4, "fadewhite", 0.15), ("c2", 2.0, "zoomin", 0.25), ("m1", 2.3, "smoothleft", 0.2),
+        ("c3", 2.2, "radial", 0.25), ("c4", 1.8, "fadewhite", 0.15), ("c5", 2.1, "zoomin", 0.25),
+        ("c6", 2.4, "smoothleft", 0.25), ("c7", 2.2, "hblur", 0.25), ("c8", 4.2, "fadeblack", 0.4)]
 d = dict((p[0], p[1]) for p in plan)
+VW = f"{V}/v121214.mp4"; VM = f"{V}/v121224.mp4"
 vid_punch("h0", VL, 2.0, d["h0"], 0.72, 0.5, 1.15, 1.3)         # gancho: cruce LED parpadeando
 vid_punch("c1", VF, 0.5, d["c1"], 0.5, 0.55, 1.0, 1.1)          # frente de la Sport Trac
+vid_punch("w1", VW, 1.8, d["w1"], 0.6, 0.5, 1.0, 1.08)          # trabajando en la parte trasera
+vid_punch("w2", VM, 4.5, d["w2"], 0.5, 0.6, 1.0, 1.06)          # trabajando en la cabina
 vid_punch("c2", VP, 0.0, d["c2"], 0.5, 0.5, 1.05, 1.18)         # caja Pioneer 9"
-vid_punch("c2b", VP, 1.6, d["c2b"], 0.5, 0.45, 1.25, 1.35)      # DAH-9250 de cerca
+vid_punch("m1", VM, 0.6, d["m1"], 0.5, 0.4, 1.0, 1.1)       # pantalla ya montada
 vid_punch("c3", VR, 0.3, d["c3"], 0.5, 0.45, 1.0, 1.15)         # parte trasera (cámara de retroceso)
 vid_punch("c4", VB, 0.4, d["c4"], 0.5, 0.5, 1.05, 1.15)         # cajas de bombillos LED
 vid_punch("c5", VL, 3.4, d["c5"], 0.4, 0.5, 1.0, 1.1)           # cruce LED encendido
@@ -92,6 +95,7 @@ def card(name, kicker, lines, col=CREAM, size=112, sub=None):
 
 card("h", "", ["¿TU CAMIONETA", "YA TIENE PANTALLA?"], col=LIGHT, size=124)
 card("t1", "AUTOPERIQUITOS Y ROTULADOS ALEXMAR", ["FORD SPORT TRAC"], size=136, sub="Así quedó")
+card("tw", "ALEXMAR · TOVAR", ["MANOS A LA OBRA"], col=LIGHT, size=124, sub="Nuestro equipo trabajando")
 card("t2", "FORD SPORT TRAC", ["PANTALLA PIONEER 9\""], col=LIGHT, size=120, sub="Con sistema Android")
 card("t3", "FORD SPORT TRAC", ["CÁMARA DE RETROCESO"], col=LIGHT, size=116)
 card("t4", "FORD SPORT TRAC", ["BOMBILLOS LED"], col=LIGHT, size=130, sub="De alta potencia")
@@ -123,13 +127,13 @@ for s_, col_ in [("Lunes a sábado · 8 am a 6 pm", CREAM), ("Tovar · Pueblo Ll
 shadow(end.crop((0, 0, W, yy + 10)), blur=16, op=220).save(f"{O}/end.png")
 
 # ---------------- composición ----------------
-e0 = st[9]
+e0 = st[11]
 def fa_(a_, b_): return f"fade=t=in:st={a_:.2f}:d=0.18:alpha=1,fade=t=out:st={b_:.2f}:d=0.15:alpha=1"
 idx = {p[0]: i for i, p in enumerate(plan)}
 cards = [("h", st[0] + 0.1, st[1] - 0.12, 700), ("t1", st[1] + 0.15, st[2] - 0.08, 640),
-         ("t2", st[2] + 0.15, st[4] - 0.08, 400), ("t3", st[4] + 0.15, st[5] - 0.08, 400),
-         ("t4", st[5] + 0.15, st[7] - 0.08, 400), ("t6", st[7] + 0.2, st[8] - 0.05, 1250),
-         ("t7", st[8] + 0.15, st[9] - 0.05, 1250)]
+         ("tw", st[2] + 0.15, st[4] - 0.08, 400), ("t2", st[4] + 0.15, st[6] - 0.08, 400),
+         ("t3", st[6] + 0.15, st[7] - 0.08, 400), ("t4", st[7] + 0.15, st[9] - 0.08, 400),
+         ("t6", st[9] + 0.2, st[10] - 0.05, 1250), ("t7", st[10] + 0.15, st[11] - 0.05, 1250)]
 L = f"-framerate {FPS} -loop 1 -t {total:.2f}"
 names = ["wm", "bar", "logo_s", "logo_b", "end"] + [c[0] for c in cards]
 ins = f"-i {S}/base.mp4 " + " ".join(f"{L} -i {O}/{n}.png" for n in names)
