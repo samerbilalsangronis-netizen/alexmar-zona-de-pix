@@ -1,4 +1,4 @@
-# TRASPASO — Publicidad ALEXMAR (actualizado martes 20-oct-2026, 3:00 pm)
+# TRASPASO — Publicidad ALEXMAR (actualizado martes 20-oct-2026, 5:30 pm)
 
 Leer esto al empezar un chat nuevo del proyecto. Las reglas generales (rol, paleta, formatos, textos) están en las instrucciones del proyecto y en la "ficha alexmar".
 
@@ -25,7 +25,7 @@ Leer esto al empezar un chat nuevo del proyecto. Las reglas generales (rol, pale
 - **Rotulados:** primero propuestas sobre fotos reales; diseño por capas de color después de que Samer escoja.
 
 ## 2. Herramientas
-- **Metricool:** brand id **7455167**, zona America/Caracas. Plan Free, **20 publicaciones al mes**. Octubre: **9 usadas, quedan 11** (para el 24–31). Hay un borrador viejo de historia (EXR, 17-oct) que Samer debe borrar desde la app (si Metricool lo cuenta, quedan 10).
+- **Metricool:** brand id **7455167**, zona America/Caracas. Plan Free, **20 publicaciones al mes**. Octubre: **10 usadas, quedan 10** (para el 24–31). Hay un borrador viejo de historia (EXR, 17-oct) que Samer debe borrar desde la app (si Metricool lo cuenta, quedan 10).
 - **Medios para Metricool:** subir al repo y usar el raw `https://raw.githubusercontent.com/samerbilalsangronis-netizen/alexmar-zona-de-pix/publicidad/<ruta>`.
 - **Higgsfield:** plan **Plus** pagado el 18-oct (1.000 créditos/mes, 49 €). Saldo ≈ **991 créditos**. Referencia: voz ~1,2 cr; video IA Kling 3.0 Pro 5 s ~8,75 cr; clonar voz 40 cr (falló con notas de WhatsApp y se reembolsó). Limitación: desde el chat no se pueden subir archivos a Higgsfield ni bajar sus resultados; Samer tiene que subir el material con la ventanita de Higgsfield. Por eso la edición normal se hace aquí con ffmpeg/Pillow.
 - **Edición:** ffmpeg + Pillow aquí; el video se manda directo al chat. Fuentes Anton/Montserrat (npm @fontsource).
@@ -43,12 +43,13 @@ Leer esto al empezar un chat nuevo del proyecto. Las reglas generales (rol, pale
 | Mié 21 | 10:00 am | **RETO luces laterales**: Cargo 1721 luces LED (sin nombre de cliente). Meta 30 me gusta + 15 compartidos → bajamos precios de luces laterales LED para camiones. `reels/cargo1721_luces_led/` | Programado |
 | Jue 22 | 10:00 am | **Toyota Merú**: luces de policía (rojo/azul en parrilla), panorámica LED morada, antena PCTEL, antena australiana, portaplacas ahumado, arreglo de placas. Sin nombre de cliente. `reels/meru_policia/` | Programado |
 | Vie 23 | 10:00 am | **Pisos 5D Toyota Hembrita** (Land Cruiser pickup). `reels/bandejas5d_hembrita/` | Programado |
+| Sáb 24 | 10:00 am | **Ford Sport Trac** (Tovar): pantalla Pioneer 9" Android (DAH-9250), cámara de retroceso, bombillos LED. Gancho "¿Tu camioneta ya tiene pantalla?", tomas del equipo trabajando. Sin nombres ni @ (Samer no quiere mencionar a nadie del equipo). `reels/sporttrac_pioneer/` | Programado |
 
-Quedan **11 espacios** del 24 al 31 (8 días: uno diario + doble en 3 días). Ideas del plan anterior: Sáb 24 Reel rotulado rifa · Sáb 24 trabajo del día · Dom 25 trabajos de la semana · Lun 26 carro de la rifa terminado · Mar 27 pisos 5D (listo en posts/) · Mié 28 educativo · Jue 29 rifa últimos tickets · Vie 30 Reel + promo · Sáb 31 lo mejor del mes · promo luces laterales si se cumple el reto. Mejor hora según Metricool: **10 am** (también 6 pm).
+Quedan **10 espacios** del 24 al 31. Ideas del plan anterior: Sáb 24 Reel rotulado rifa (segundo del día) · Dom 25 trabajos de la semana · Lun 26 carro de la rifa terminado · Mar 27 pisos 5D (listo en posts/) · Mié 28 educativo · Jue 29 rifa últimos tickets · Vie 30 Reel + promo · Sáb 31 lo mejor del mes · promo luces laterales si se cumple el reto. Mejor hora según Metricool: **10 am** (también 6 pm).
 
 ## 4. Historias (las sube Samer a mano)
 - Mié 21, 10:15 am: compartir el Reel del RETO con avión de papel + "¡Ayúdanos a llegar a la meta!".
-- Jue 22, 10:15 am: compartir Reel Merú. Vie 23, 10:15 am: compartir Reel Hembrita.
+- Jue 22, 10:15 am: compartir Reel Merú. Vie 23, 10:15 am: compartir Reel Hembrita. Sáb 24, 10:15 am: compartir Reel Sport Trac.
 - Las alarmas semanales viejas (dom/lun/mar 7:20 am, 11:35, 11:45, 1:05, 1:15, 7:20 pm) hay que borrarlas.
 
 ## 5. Pendientes
@@ -64,7 +65,7 @@ Quedan **11 espacios** del 24 al 31 (8 días: uno diario + doble en 3 días). Id
 - `reels/<trabajo>/`: versión sin audio, con audio y scripts. Carpetas: `scorpion_f250`, `aveo_interior`, `cargo1721_nixon`, `alfombras_scorpion`, `cargo1721_luces_led`, `meru_policia`, `bandejas5d_hembrita`.
 - Plantilla de montaje más reciente: `reels/meru_policia/build_meru.py` + `ov_meru.py` (funciones `vid_punch` = acercamiento en video con centro y zoom; `photo_punch` = acercamiento en foto con foco; `still_full`; xfade encadenado; tarjetas de texto con banda oscura; logo, marca de agua, barra con ALEXMAR y teléfono abajo; cierre con logo grande, teléfono, horario y sedes).
 - `rotulados/rifa_prestigio/`, `historias/`, `piezas/`.
-- **Estilo de montaje que le gusta:** cortes de 2–3 s, transiciones xfade 0.3–0.45 s (fadewhite como destello, zoomin, smoothleft, smoothup, circleopen, slideleft, fadeblack), color con contraste 1.10–1.12 y saturación 1.18–1.22, textos arriba (y=400) para no tapar el trabajo, frase épica abajo (y≈1250), duración 22–27 s.
+- **Estilo de montaje que le gusta:** (desde el Sport Trac) más rítmico: frase gancho al inicio, cortes de 1,6–2,4 s, xfade rápidos 0.15–0.25 s (fadewhite, hlslice, radial, zoomin, smoothleft, hblur) y golpe de zoom al inicio de cada toma (`kick` en `vid_punch`); recortar tiempos muertos de los videos. Plantilla: `reels/sporttrac_pioneer/build_sporttrac.py`. Antes: cortes de 2–3 s, transiciones xfade 0.3–0.45 s (fadewhite como destello, zoomin, smoothleft, smoothup, circleopen, slideleft, fadeblack), color con contraste 1.10–1.12 y saturación 1.18–1.22, textos arriba (y=400) para no tapar el trabajo, frase épica abajo (y≈1250), duración 22–27 s.
 
 ## 7. Clientes mostrados
 - Esteban Lolo: Chevrolet EXR (historia).
