@@ -25,15 +25,17 @@ def spot(name, ox, oy, r=360, dark=140):
     out = Image.new("RGBA", (W, H), (0, 0, 0, 0)); out.putalpha(im); out.save(f"{O}/{name}.png"); return f"{O}/{name}.png"
 
 v = lambda n: f"{V}/v{n}.mp4"
-plan = [("h0", 2.6, None, 0), ("c1", 2.4, "fade", 0.3),
+plan = [("x0", 2.6, None, 0), ("h0", 2.6, "fade", 0.3), ("c1", 2.4, "fade", 0.3),
         ("c4", 3.6, "fadewhite", 0.25), ("c5", 3.4, "fade", 0.4),
         ("c6", 3.2, "smoothleft", 0.4), ("c7", 2.2, "fade", 0.4), ("c8", 3.6, "smoothleft", 0.4),
         ("c9", 3.6, "fade", 0.4), ("c10", 3.4, "fade", 0.4), ("c11", 3.2, "fade", 0.4),
-        ("c12", 4.4, "fadeblack", 0.5)]
+        ("x1", 2.8, "fade", 0.4), ("c12", 4.4, "fadeblack", 0.5)]
 d = dict((p[0], p[1]) for p in plan)
 K = 0.0   # sin golpe de zoom: tomas tranquilas para apreciar la bandeja
+vid_punch("x0", v(120539), 0.0, d["x0"], 0.5, 0.5, 1.0, 1.04, kick=K)     # abre: la Hilux por fuera
 vid_punch("h0", v(120641), 1.4, d["h0"], 0.5, 0.5, 1.0, 1.04, kick=K)     # antes: alfombra vieja delantera
 vid_punch("c1", v(120627), 0.3, d["c1"], 0.5, 0.5, 1.0, 1.04, kick=K)     # antes: alfombras viejas traseras
+vid_punch("x1", v(120539), 0.2, d["x1"], 0.5, 0.5, 1.0, 1.05, kick=K)     # cierra: la Hilux por fuera
 vid_punch("c4", v(121238), 8.6, d["c4"], 0.5, 0.5, 1.0, 1.03, kick=K)     # después: bandeja conductor
 vid_punch("c5", v(121349), 7.0, d["c5"], 0.5, 0.5, 1.0, 1.03, kick=K)     # conductor, vista abierta
 vid_punch("c6", v(121256), 8.0, d["c6"], 0.5, 0.5, 1.0, 1.03, kick=K)     # copiloto
@@ -42,7 +44,7 @@ vid_punch("c8", v(121620), 0.0, d["c8"], 0.5, 0.5, 1.0, 1.03, kick=K)     # tras
 vid_punch("c9", v(121314), 0.2, d["c9"], 0.5, 0.5, 1.0, 1.03, kick=K)     # trasera con asientos
 vid_punch("c10", v(121334), 4.6, d["c10"], 0.5, 0.5, 1.0, 1.03, kick=K)   # trasera con logo HILUX
 vid_punch("c11", v(121620), 6.2, d["c11"], 0.5, 0.5, 1.0, 1.03, kick=K)   # vista general
-vid_punch("c12", v(121238), 7.8, d["c12"], 0.5, 0.5, 1.1, 1.0, extra=",boxblur=6:2,eq=brightness=-0.35,vignette=PI/4", kick=0)
+vid_punch("c12", v(120539), 1.2, d["c12"], 0.5, 0.5, 1.1, 1.0, extra=",boxblur=6:2,eq=brightness=-0.35,vignette=PI/4", kick=0)
 spots = {}
 inputs = " ".join(f"-i {S}/{p[0]}.mp4" for p in plan)
 fc = []; prev = "[0:v]"; t = 0.0; st = [0.0]
@@ -91,7 +93,9 @@ def card(name, kicker, lines, col=CREAM, size=112, sub=None):
     band.alpha_composite(shadow(im, blur=16, op=210).crop((48, 48, 48 + W, 48 + im.height)), (0, pad))
     band.save(f"{O}/{name}.png")
 
-card("h", "TOYOTA HILUX 2025", ["ANTES"], col=CREAM, size=160)
+card("x", "AUTOPERIQUITOS Y ROTULADOS ALEXMAR", ["TOYOTA HILUX 2025"], col=LIGHT, size=124)
+card("xb", "", ["TU HILUX, A OTRO NIVEL"], col=CREAM, size=96)
+card("h", "", ["ANTES"], col=CREAM, size=160)
 card("t4", "", ["DESPUÉS"], col=LIGHT, size=160)
 card("t5", "TOYOTA HILUX 2025", ["PISOS 5D TIPO BANDEJA"], col=LIGHT, size=110)
 card("t6", "BANDEJAS RÍGIDAS", ["ALTA RESISTENCIA"], col=LIGHT, size=124)
@@ -123,12 +127,13 @@ for s_, col_ in [("Lunes a sábado · 8 am a 6 pm", CREAM), ("Tovar · Pueblo Ll
 shadow(end.crop((0, 0, W, yy + 10)), blur=16, op=220).save(f"{O}/end.png")
 
 # ---------------- composición ----------------
-e0 = st[10]
+e0 = st[12]
 def fa_(a_, b_): return f"fade=t=in:st={a_:.2f}:d=0.18:alpha=1,fade=t=out:st={b_:.2f}:d=0.15:alpha=1"
 idx = {p[0]: i for i, p in enumerate(plan)}
 def c_(nm, i0, i1, y, a=0.15): return (nm, st[i0] + a, st[i1] - 0.08, y)
-cards = [c_("h", 0, 2, 380, 0.1), c_("t4", 2, 3, 360), c_("t5", 3, 4, 360),
-         c_("t6", 4, 6, 360), c_("t8", 6, 8, 360), c_("t10", 8, 9, 360), c_("t11", 9, 10, 360)]
+cards = [c_("x", 0, 1, 760, 0.1), c_("h", 1, 3, 380), c_("t4", 3, 4, 360), c_("t5", 4, 5, 360),
+         c_("t6", 5, 7, 360), c_("t8", 7, 9, 360), c_("t10", 9, 10, 360), c_("t11", 10, 11, 360),
+         c_("xb", 11, 12, 1300, 0.3)]
 L = f"-framerate {FPS} -loop 1 -t {total:.2f}"
 names = ["wm", "bar", "logo_s", "logo_b", "end"] + [c[0] for c in cards]
 ins = f"-i {S}/base.mp4 " + " ".join(f"{L} -i {O}/{n}.png" for n in names)
