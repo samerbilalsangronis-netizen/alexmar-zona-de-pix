@@ -60,3 +60,17 @@ def place(logo, out, fill=0.84):
 place(v1, "garra_azcar_v1_silueta_blanca.jpg")
 place(v2, "garra_azcar_v2_letras_blancas.jpg")
 print(v1.size, v2.size)
+
+# ---- V2 final: + línea "LOS ARAQUES · ESTADO MÉRIDA" ----
+from PIL import ImageDraw, ImageFont
+F = "../../plantillas/fonts/Mont900.ttf"
+txt = "LOS ARAQUES · ESTADO MÉRIDA"
+fs = 200
+while ImageFont.truetype(F, fs).getlength(txt) > v2.width * 0.78: fs -= 4
+f = ImageFont.truetype(F, fs); bb = f.getbbox(txt)
+gap = int(v2.height * 0.08)
+canvas = Image.new("RGBA", (v2.width, v2.height + gap + (bb[3] - bb[1]) + 10), (0, 0, 0, 0))
+canvas.alpha_composite(v2, (0, 0))
+ImageDraw.Draw(canvas).text(((v2.width - (bb[2] - bb[0])) / 2 - bb[0], v2.height + gap - bb[1]), txt, font=f, fill=(245, 245, 245, 255))
+canvas.save("azcar_v2_final_los_araques.png")
+place(canvas, "garra_azcar_v2_final_los_araques.jpg", fill=0.82)
