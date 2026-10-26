@@ -16,12 +16,12 @@ cv = bg.convert("RGBA")
 t = Image.new("RGBA", (2600, 2600), (0, 0, 0, 0)); td = ImageDraw.Draw(t); f = ImageFont.truetype(ANTON, 120)
 for row in range(0, 2600, 260):
     off = (row // 260 % 2) * 300
-    for col in range(-600, 2600, 600): td.text((col + off, row), "ALEXMAR", font=f, fill=(255, 255, 255, 10))
+    for col in range(-600, 2600, 600): td.text((col + off, row), "ALEXMAR", font=f, fill=(255, 255, 255, 7))
 t = t.rotate(30, resample=Image.BICUBIC); cv.alpha_composite(t.crop(((2600 - W) // 2, (2600 - H) // 2, (2600 - W) // 2 + W, (2600 - H) // 2 + H)))
 # logo grande fantasma detrás de la pieza
 lg = Image.open(f"{R}/assets/logo_alexmar_sticker.png").convert("RGBA"); lg = lg.crop(lg.getbbox())
 lw = 900; lg = lg.resize((lw, int(lg.height * lw / lg.width)), Image.LANCZOS).convert("LA").convert("RGBA")
-a = lg.split()[3].point(lambda v: int(v * 0.09)); lg.putalpha(a)
+a = lg.split()[3].point(lambda v: int(v * 0.045)); lg.putalpha(a)
 cv.alpha_composite(lg, ((W - lw) // 2, (H - lg.height) // 2 + 40))
 # anillo naranja fino detrás de la pieza
 ring = Image.new("RGBA", (W, H), (0, 0, 0, 0)); rd = ImageDraw.Draw(ring)
