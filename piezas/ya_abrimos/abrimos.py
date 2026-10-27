@@ -18,7 +18,12 @@ def txt(cv, x, y, s, f, fill, sp=0, anchor="r"):
     lay = lay.crop(lay.getbbox()); lay, p = shadow(lay, 12, 210)
     X = x - lay.width + p if anchor == "r" else (x - lay.width // 2 if anchor == "c" else x - p)
     cv.alpha_composite(lay, (int(X), int(y - p))); return y + lay.height - 2 * p
-ph = Image.open(f"{D}/foto_tienda.jpg").convert("RGB")
+import sys
+SRC = sys.argv[1] if len(sys.argv) > 1 else "foto_tienda.jpg"; OUT = sys.argv[2] if len(sys.argv) > 2 else "alexmar_ya_abrimos.jpg"
+ph = Image.open(f"{D}/{SRC}").convert("RGB")
+if SRC == "foto_pioneer.jpg":   # tapar la pantalla de la laptop
+    k = ph.width / 1500; box = tuple(int(v * k) for v in (960, 1010, 1500, 1345))
+    reg = ph.crop(box).filter(ImageFilter.GaussianBlur(40)); reg = ImageEnhance.Brightness(reg).enhance(0.55); ph.paste(reg, box)
 ph = ImageEnhance.Contrast(ph).enhance(1.08); ph = ImageEnhance.Color(ph).enhance(1.12)
 s = max(W / ph.width, H / ph.height); ph = ph.resize((round(ph.width * s), round(ph.height * s)), Image.LANCZOS)
 y0 = 0; cv = ph.crop((0, y0, W, y0 + H)).convert("RGBA")
@@ -32,11 +37,11 @@ lw = 190; lg = LOGO.resize((lw, int(LOGO.height * lw / LOGO.width)), Image.LANCZ
 x = W - 50; y = 46
 y = txt(cv, x, y, "¡BUENOS DÍAS!", ImageFont.truetype(M9, 34), CREAM, sp=4) + 12
 y = txt(cv, x, y, "YA ABRIMOS", ImageFont.truetype(ANTON, 118), TERRA, sp=2) + 12
-txt(cv, x, y, "Te esperamos con todo para tu carro", ImageFont.truetype(M7, 27), CREAM)
+txt(cv, x, y, "Sonido Pioneer, luces y accesorios para tu carro" if SRC == "foto_pioneer.jpg" else "Te esperamos con todo para tu carro", ImageFont.truetype(M7, 27), CREAM)
 bh = 112; bar = Image.new("RGBA", (W, bh), TERRA + (255,)); bd = ImageDraw.Draw(bar)
 fp = ImageFont.truetype(ANTON, 66); bd.text((46, (bh - fp.size) / 2 - 10), "0416-676 83 93", font=fp, fill=BLACK + (255,))
 fl = ImageFont.truetype(M9, 26)
 for i, s_ in enumerate(["TOVAR · PUEBLO LLANO", "LUNES A SÁBADO 8 AM - 6 PM"]):
     sw = bd.textlength(s_, font=fl); bd.text((W - 46 - sw, bh / 2 - 34 + i * 38), s_, font=fl, fill=BLACK + (255,))
 cv.alpha_composite(bar, (0, H - bh))
-cv.convert("RGB").save(f"{D}/alexmar_ya_abrimos.jpg", quality=95); print("ok")
+cv.convert("RGB").save(f"{D}/{OUT}", quality=95); print("ok")
