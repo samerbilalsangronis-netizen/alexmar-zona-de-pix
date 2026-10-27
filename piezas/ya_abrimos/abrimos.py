@@ -21,7 +21,7 @@ def txt(cv, x, y, s, f, fill, sp=0, anchor="r"):
 import sys
 SRC = sys.argv[1] if len(sys.argv) > 1 else "foto_tienda.jpg"; OUT = sys.argv[2] if len(sys.argv) > 2 else "alexmar_ya_abrimos.jpg"
 ph = Image.open(f"{D}/{SRC}").convert("RGB")
-if SRC == "foto_pioneer.jpg":   # tapar la pantalla de la laptop
+if False:   # (desactivado) tapar la pantalla de la laptop
     k = ph.width / 1500; box = tuple(int(v * k) for v in (960, 1010, 1500, 1345))
     reg = ph.crop(box).filter(ImageFilter.GaussianBlur(40)); reg = ImageEnhance.Brightness(reg).enhance(0.55); ph.paste(reg, box)
 ph = ImageEnhance.Contrast(ph).enhance(1.08); ph = ImageEnhance.Color(ph).enhance(1.12)
