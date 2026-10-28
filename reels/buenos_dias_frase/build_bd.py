@@ -1,0 +1,144 @@
+"""Reel de buenos días con frase motivadora (texto resaltado línea por línea) sobre videos de la tienda."""
+import os, sys, subprocess
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+D = os.path.dirname(os.path.abspath(__file__)); R = os.path.join(D, "..", "..", "plantillas")
+V = sys.argv[1] if len(sys.argv) > 1 else D
+FT = f"{R}/fonts"; ANTON = f"{FT}/Anton.ttf"; M8 = f"{FT}/Mont900.ttf"; M4 = f"{FT}/Mont700.ttf"
+TERRA = (217, 119, 87, 255); LIGHT = (240, 165, 126, 255); CREAM = (245, 240, 232, 255)
+W, H, FPS = 1080, 1920, 30
+S = f"{D}/seg"; O = f"{D}/ov"; os.makedirs(S, exist_ok=True); os.makedirs(O, exist_ok=True)
+def run(c): subprocess.run(c, shell=True, check=True)
+GRADE = "eq=contrast=1.11:saturation=1.20:brightness=-0.03"
+
+def vid_punch(name, src, ss, dur, cx, cy, z0, z1, extra="", kick=0.14):
+    n = int(dur * FPS)
+    vf = (f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},"
+          f"zoompan=z='{z0}+({z1}-{z0})*on/{n}+{kick}*exp(-on/4)':x='max(0,min(iw-iw/zoom,{cx}*iw-iw/zoom/2))':y='max(0,min(ih-ih/zoom,{cy}*ih-ih/zoom/2))':d=1:s={W}x{H}:fps={FPS},{GRADE}{extra},format=yuv420p")
+    run(f'ffmpeg -v error -y -ss {ss} -t {dur} -i "{src}" -vf "{vf}" -an -c:v libx264 -preset veryfast -crf 17 {S}/{name}.mp4')
+
+def spot(name, ox, oy, r=360, dark=140):
+    im = Image.new("L", (W, H), dark); d = ImageDraw.Draw(im)
+    d.ellipse((ox - r, oy - r, ox + r, oy + r), fill=0); im = im.filter(ImageFilter.GaussianBlur(r * 0.55))
+    out = Image.new("RGBA", (W, H), (0, 0, 0, 0)); out.putalpha(im); out.save(f"{O}/{name}.png"); return f"{O}/{name}.png"
+
+
+v = lambda n: f"{V}/{n}.mp4"
+plan = [("s1", 2.6, None, 0), ("s2", 2.2, "fadewhite", 0.2), ("s3", 2.2, "smoothleft", 0.25),
+        ("q", 10.5, "fade", 0.6), ("s4", 2.4, "fadewhite", 0.25), ("e", 3.8, "fadeblack", 0.4)]
+d = dict((p[0], p[1]) for p in plan)
+vid_punch("s1", v("a"), 4.2, d["s1"], 0.5, 0.5, 1.0, 1.06)       # pasillo de la tienda
+vid_punch("s2", v("a"), 10.0, d["s2"], 0.5, 0.5, 1.0, 1.06)      # exhibición de luces
+vid_punch("s3", v("b"), 5.6, d["s3"], 0.5, 0.5, 1.0, 1.06)       # Pioneer
+vid_punch("q", v("a"), 6.0, d["q"], 0.5, 0.5, 1.0, 1.08, extra=",gblur=sigma=14,eq=brightness=-0.42:saturation=0.75", kick=0)
+vid_punch("s4", v("b"), 11.0, d["s4"], 0.5, 0.5, 1.0, 1.06)      # muro de luces
+vid_punch("e", v("b"), 8.5, d["e"], 0.5, 0.5, 1.1, 1.0, extra=",boxblur=6:2,eq=brightness=-0.35,vignette=PI/4", kick=0)
+inputs = " ".join(f"-i {S}/{p[0]}.mp4" for p in plan)
+fc = []; prev = "[0:v]"; t = 0.0; st = [0.0]
+for i in range(1, len(plan)):
+    t += plan[i - 1][1] - plan[i][3]; st.append(t)
+    fc.append(f"{prev}[{i}:v]xfade=transition={plan[i][2]}:duration={plan[i][3]}:offset={t:.3f}[x{i}]"); prev = f"[x{i}]"
+total = t + plan[-1][1]
+run(f'ffmpeg -v error -y {inputs} -filter_complex "{";".join(fc)}" -map "{prev}" -c:v libx264 -preset veryfast -crf 17 {S}/base.mp4')
+def shadow(im, blur=14, off=(0, 6), op=180):
+    pad = blur * 3
+    base = Image.new("RGBA", (im.width + pad * 2, im.height + pad * 2), (0, 0, 0, 0))
+    a = im.split()[3].point(lambda v: v * op // 255)
+    blk = Image.new("RGBA", im.size, (0, 0, 0, 255)); blk.putalpha(a)
+    sh = Image.new("RGBA", base.size, (0, 0, 0, 0)); sh.paste(blk, (pad + off[0], pad + off[1]), blk)
+    sh = sh.filter(ImageFilter.GaussianBlur(blur))
+    base = Image.alpha_composite(base, sh); base.alpha_composite(im, (pad, pad)); return base
+def spaced_w(t, f, sp):
+    dd = ImageDraw.Draw(Image.new("RGBA", (1, 1))); return sum(dd.textlength(c, font=f) for c in t) + sp * (len(t) - 1)
+def spaced(dr, xy, t, f, fill, sp):
+    x, y = xy
+    for c in t: dr.text((x, y), c, font=f, fill=fill); x += dr.textlength(c, font=f) + sp
+
+def card(name, kicker, lines, col=CREAM, size=112, sub=None):
+    im = Image.new("RGBA", (W, 760), (0, 0, 0, 0)); dr = ImageDraw.Draw(im); y = 0
+    if kicker:
+        fk = ImageFont.truetype(M8, 28); sp = 8; kw = spaced_w(kicker, fk, sp)
+        spaced(dr, ((W - kw) / 2, y), kicker, fk, LIGHT, sp); y += 50
+        dr.rectangle(((W - 110) / 2, y, (W + 110) / 2, y + 5), fill=TERRA); y += 30
+    for ln in lines:
+        s = size
+        while True:
+            fm = ImageFont.truetype(ANTON, s); b = dr.textbbox((0, 0), ln, font=fm)
+            if b[2] - b[0] <= W - 110 or s < 40: break
+            s -= 4
+        dr.text(((W - (b[2] - b[0])) / 2 - b[0], y - b[1]), ln, font=fm, fill=col); y += (b[3] - b[1]) + 20
+    if sub:
+        fs = ImageFont.truetype(M4, 38); sw = dr.textlength(sub, font=fs)
+        dr.text(((W - sw) / 2, y + 6), sub, font=fs, fill=CREAM); y += 60
+    im = im.crop((0, 0, W, y + 10)); pad = 50
+    band = Image.new("RGBA", (W, im.height + pad * 2), (0, 0, 0, 0)); bd = ImageDraw.Draw(band)
+    for yy in range(band.height):
+        e = min(yy, band.height - 1 - yy) / pad
+        bd.line((0, yy, W, yy), fill=(10, 10, 10, int(160 * min(1, e))))
+    band.alpha_composite(shadow(im, blur=16, op=210).crop((48, 48, 48 + W, 48 + im.height)), (0, pad))
+    band.save(f"{O}/{name}.png")
+
+
+card("h", "AUTOPERIQUITOS Y ROTULADOS ALEXMAR", ["¡BUENOS DÍAS!"], col=LIGHT, size=150, sub="Ya estamos abiertos")
+card("s", "", ["¡FELIZ MIÉRCOLES!"], col=CREAM, size=110)
+# ---- frase: líneas con resaltado naranja (estilo libreta) ----
+QUOTE = [("Levántate temprano,", True), ("trabaja duro", True), ("y confía en", False), ("tu proceso.", False),
+         ("Lo que hoy siembras", False), ("con esfuerzo,", False), ("mañana lo cosechas", True), ("con orgullo.", True)]
+FQ = ImageFont.truetype(f"{FT}/Mont900.ttf", 78)
+def qline(i, txt, hl):
+    dd = ImageDraw.Draw(Image.new("RGBA", (1, 1))); b = dd.textbbox((0, 0), txt, font=FQ)
+    w, h = b[2] - b[0], b[3] - b[1]; pad = 22
+    im = Image.new("RGBA", (w + pad * 2, 140), (0, 0, 0, 0)); dr = ImageDraw.Draw(im)
+    if hl: dr.rectangle((0, 10, w + pad * 2, 130), fill=TERRA)
+    dr.text((pad - b[0], (140 - h) / 2 - b[1]), txt, font=FQ, fill=(26, 26, 26, 255) if hl else CREAM)
+    im.save(f"{O}/q{i}.png"); return im.size
+QS = [qline(i, t_, h_) for i, (t_, h_) in enumerate(QUOTE)]
+lgi = Image.open(f"{R}/assets/logo_alexmar_sticker.png").convert("RGBA"); lgi = lgi.crop(lgi.getbbox())
+def logo(wd): return lgi.resize((wd, int(lgi.height * wd / lgi.width)), Image.LANCZOS)
+shadow(logo(210), blur=10, op=190).save(f"{O}/logo_s.png")
+shadow(logo(540), blur=18, op=200).save(f"{O}/logo_b.png")
+bar = Image.new("RGBA", (W, 120), (0, 0, 0, 0)); dr = ImageDraw.Draw(bar)
+for yy in range(120): dr.line((0, yy, W, yy), fill=(10, 10, 10, int(200 * yy / 119)))
+dr.text((44, 52), "ALEXMAR", font=ImageFont.truetype(ANTON, 50), fill=TERRA)
+fp = ImageFont.truetype(ANTON, 52); pw = dr.textlength("0416-676 83 93", font=fp)
+dr.text((W - 44 - pw, 50), "0416-676 83 93", font=fp, fill=CREAM); bar.save(f"{O}/bar.png")
+wm = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+txt = Image.new("RGBA", (1400, 400), (0, 0, 0, 0)); ImageDraw.Draw(txt).text((20, 0), "ALEXMAR", font=ImageFont.truetype(ANTON, 300), fill=(255, 255, 255, 20))
+txt = txt.rotate(60, expand=True, resample=Image.BICUBIC); wm.alpha_composite(txt, ((W - txt.width) // 2, (H - txt.height) // 2)); wm.save(f"{O}/wm.png")
+end = Image.new("RGBA", (W, 820), (0, 0, 0, 0)); dr = ImageDraw.Draw(end)
+fk = ImageFont.truetype(M8, 34); sp = 8; k = "AUTOPERIQUITOS Y ROTULADOS"; kw = spaced_w(k, fk, sp); spaced(dr, ((W - kw) / 2, 0), k, fk, CREAM, sp)
+fa = ImageFont.truetype(ANTON, 190); b = dr.textbbox((0, 0), "ALEXMAR", font=fa)
+dr.text(((W - (b[2] - b[0])) / 2 - b[0], 60 - b[1]), "ALEXMAR", font=fa, fill=TERRA); yy = 60 + (b[3] - b[1]) + 30
+dr.rectangle(((W - 160) / 2, yy, (W + 160) / 2, yy + 5), fill=LIGHT); yy += 40
+fpn = ImageFont.truetype(ANTON, 120); b = dr.textbbox((0, 0), "0416-676 83 93", font=fpn)
+dr.text(((W - (b[2] - b[0])) / 2 - b[0], yy - b[1]), "0416-676 83 93", font=fpn, fill=CREAM); yy += (b[3] - b[1]) + 34
+fl = ImageFont.truetype(M4, 38)
+for s_, col_ in [("Lunes a sábado · 8 am a 6 pm", CREAM), ("Tovar · Pueblo Llano · @autoalexmar_car", LIGHT)]:
+    sw = dr.textlength(s_, font=fl); dr.text(((W - sw) / 2, yy), s_, font=fl, fill=col_); yy += 58
+shadow(end.crop((0, 0, W, yy + 10)), blur=16, op=220).save(f"{O}/end.png")
+
+# ---------------- composición ----------------
+
+e0 = st[5]
+def fa_(a_, b_): return f"fade=t=in:st={a_:.2f}:d=0.3:alpha=1,fade=t=out:st={b_:.2f}:d=0.25:alpha=1"
+q0 = st[3]; qend = st[4] - 0.25
+cards = [("h", st[0] + 0.25, st[3] - 0.2, 760), ("s", st[4] + 0.2, st[5] - 0.1, 1300)]
+L = f"-framerate {FPS} -loop 1 -t {total:.2f}"
+names = ["wm", "bar", "logo_s", "logo_b", "end"] + [c[0] for c in cards] + [f"q{i}" for i in range(len(QUOTE))]
+ins = f"-i {S}/base.mp4 " + " ".join(f"{L} -i {O}/{n}.png" for n in names)
+f = [f"[1]format=rgba,fade=t=out:st={e0:.2f}:d=0.5:alpha=1[wm]",
+     f"[2]format=rgba,fade=t=in:st=0.3:d=0.5:alpha=1,fade=t=out:st={e0:.2f}:d=0.5:alpha=1[bar]",
+     f"[3]format=rgba,fade=t=in:st=0.2:d=0.5:alpha=1,fade=t=out:st={e0:.2f}:d=0.5:alpha=1[ls]",
+     f"[4]format=rgba,fade=t=in:st={e0+0.3:.2f}:d=0.6:alpha=1[lb]",
+     f"[5]format=rgba,fade=t=in:st={e0+0.8:.2f}:d=0.6:alpha=1[en]",
+     "[0:v][wm]overlay=0:0[a0]", "[a0][bar]overlay=0:H-h[a1]", "[a1][ls]overlay=30:40[a2]"]
+cur = "a2"
+for i, (nm, a_, b_, y) in enumerate(cards):
+    f.append(f"[{6+i}]format=rgba,{fa_(a_, b_)}[c{i}]"); f.append(f"[{cur}][c{i}]overlay=(W-w)/2:{y}-h/2[b{i}]"); cur = f"b{i}"
+qi0 = 6 + len(cards); LH = 152; y0 = 960 - LH * len(QUOTE) / 2
+for i in range(len(QUOTE)):
+    ta = q0 + 0.5 + i * 0.55
+    f.append(f"[{qi0+i}]format=rgba,fade=t=in:st={ta:.2f}:d=0.3:alpha=1,fade=t=out:st={qend:.2f}:d=0.3:alpha=1[q{i}]")
+    f.append(f"[{cur}][q{i}]overlay=x='50-60*max(0\\,min(1\\,1-(t-{ta:.2f})/0.35))':y={y0 + i*LH:.0f}[r{i}]"); cur = f"r{i}"
+f += [f"[{cur}][lb]overlay=(W-w)/2:300[e1]", "[e1][en]overlay=(W-w)/2:930,format=yuv420p[v]"]
+run(f'ffmpeg -v error -y {ins} -filter_complex "{";".join(f)}" -map "[v]" -an -c:v libx264 -preset medium -crf 19 -r {FPS} -movflags +faststart -t {total:.2f} {D}/alexmar_buenos_dias_frase_sin_audio.mp4')
+print("total", round(total, 2), "starts", [round(x, 2) for x in st])
