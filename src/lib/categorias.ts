@@ -14,6 +14,7 @@ export const ICONOS_CATEGORIA: Record<string, string> = {
   'CUIDADO Y ESTETICA': '🧴',
   'ACCESORIOS INT-EXT': '🎨',
   'PLAST INNOVA': '🔦',
+  SCORPION: '🦂',
 };
 
 export function iconoCategoria(categoria: string): string {

@@ -80,6 +80,7 @@ export const CATEGORIAS_INVENTARIO = [
   'CUIDADO Y ESTETICA',
   'ACCESORIOS INT-EXT',
   'PLAST INNOVA',
+  'SCORPION',
 ] as const;
 
 export interface Proveedor {
