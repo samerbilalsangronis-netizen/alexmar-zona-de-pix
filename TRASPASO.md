@@ -84,3 +84,4 @@ Quedan **10 espacios** del 24 al 31. Ideas del plan anterior: Sáb 24 Reel rotul
 - Volante + tapa: reel media 5b02905c-258b-4ea5-a063-4d2edacff8ea. Keyframes: armado 37adcce9, tapa fuera 2c4c9b2a, trasera c67698c8. Cierre = clip 1 en reversa.
 - Método: gpt_image_2_5 keyframes 9:16 → minimax_h3 start/end 6 s → overlays.py + mk.sh (sandbox Higgsfield, carpetas faro/ y vol/).
 - Pendiente: más piezas, música de Samer, unir todo en carrusel (máx. 10 láminas), marcar isAiGenerated.
+- Fusilera: reel media 77261846-6032-42f4-b689-eaded9d0f086 (17 s). Keyframes: armada 72d53914 (sin tarjeta SecuriCode), fusibles fuera b45287dc. Clip + reversa. Ojo: la foto original trae el código de acceso del vehículo; en el repo quedó difuminado.
