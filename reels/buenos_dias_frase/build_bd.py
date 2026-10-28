@@ -23,15 +23,15 @@ def spot(name, ox, oy, r=360, dark=140):
 
 
 v = lambda n: f"{V}/{n}.mp4"
-plan = [("s1", 2.6, None, 0), ("s2", 2.2, "fadewhite", 0.2), ("s3", 2.2, "smoothleft", 0.25),
-        ("q", 10.5, "fade", 0.6), ("s4", 2.4, "fadewhite", 0.25), ("e", 3.8, "fadeblack", 0.4)]
+plan = [("s1", 4.2, None, 0), ("s2", 4.2, "fade", 0.5), ("s3", 4.2, "smoothleft", 0.5),
+        ("s4", 4.2, "fade", 0.5), ("s5", 4.2, "fade", 0.5), ("e", 3.8, "fadeblack", 0.5)]
 d = dict((p[0], p[1]) for p in plan)
-vid_punch("s1", v("a"), 4.2, d["s1"], 0.5, 0.5, 1.0, 1.06)       # pasillo de la tienda
-vid_punch("s2", v("a"), 10.0, d["s2"], 0.5, 0.5, 1.0, 1.06)      # exhibición de luces
-vid_punch("s3", v("b"), 5.6, d["s3"], 0.5, 0.5, 1.0, 1.06)       # Pioneer
-vid_punch("q", v("a"), 6.0, d["q"], 0.5, 0.5, 1.0, 1.08, extra=",gblur=sigma=14,eq=brightness=-0.42:saturation=0.75", kick=0)
-vid_punch("s4", v("b"), 11.0, d["s4"], 0.5, 0.5, 1.0, 1.06)      # muro de luces
-vid_punch("e", v("b"), 8.5, d["e"], 0.5, 0.5, 1.1, 1.0, extra=",boxblur=6:2,eq=brightness=-0.35,vignette=PI/4", kick=0)
+vid_punch("s1", v("a"), 4.0, d["s1"], 0.5, 0.5, 1.0, 1.05, kick=0)     # pasillo de la tienda
+vid_punch("s2", v("a"), 9.6, d["s2"], 0.5, 0.5, 1.0, 1.05, kick=0)     # exhibición de luces
+vid_punch("s3", v("b"), 0.0, d["s3"], 0.5, 0.5, 1.0, 1.05, kick=0)     # vitrinas
+vid_punch("s4", v("b"), 5.2, d["s4"], 0.5, 0.5, 1.0, 1.05, kick=0)     # Pioneer
+vid_punch("s5", v("b"), 10.2, d["s5"], 0.5, 0.5, 1.0, 1.05, kick=0)    # muro de luces
+vid_punch("e", v("a"), 15.5, d["e"], 0.5, 0.5, 1.1, 1.0, extra=",boxblur=6:2,eq=brightness=-0.35,vignette=PI/4", kick=0)
 inputs = " ".join(f"-i {S}/{p[0]}.mp4" for p in plan)
 fc = []; prev = "[0:v]"; t = 0.0; st = [0.0]
 for i in range(1, len(plan)):
@@ -81,14 +81,13 @@ def card(name, kicker, lines, col=CREAM, size=112, sub=None):
 card("h", "AUTOPERIQUITOS Y ROTULADOS ALEXMAR", ["¡BUENOS DÍAS!"], col=LIGHT, size=150, sub="Ya estamos abiertos")
 card("s", "", ["¡FELIZ MIÉRCOLES!"], col=CREAM, size=110)
 # ---- frase: líneas con resaltado naranja (estilo libreta) ----
-QUOTE = [("Levántate temprano,", True), ("trabaja duro", True), ("y confía en", False), ("tu proceso.", False),
-         ("Lo que hoy siembras", False), ("con esfuerzo,", False), ("mañana lo cosechas", True), ("con orgullo.", True)]
-FQ = ImageFont.truetype(f"{FT}/Mont900.ttf", 78)
+QUOTE = [("El éxito se construye", False), ("cada mañana.", True)]
+FQ = ImageFont.truetype(f"{FT}/Mont900.ttf", 84)
 def qline(i, txt, hl):
     dd = ImageDraw.Draw(Image.new("RGBA", (1, 1))); b = dd.textbbox((0, 0), txt, font=FQ)
     w, h = b[2] - b[0], b[3] - b[1]; pad = 22
     im = Image.new("RGBA", (w + pad * 2, 140), (0, 0, 0, 0)); dr = ImageDraw.Draw(im)
-    if hl: dr.rectangle((0, 10, w + pad * 2, 130), fill=TERRA)
+    dr.rectangle((0, 10, w + pad * 2, 130), fill=TERRA if hl else (20, 18, 18, 215))
     dr.text((pad - b[0], (140 - h) / 2 - b[1]), txt, font=FQ, fill=(26, 26, 26, 255) if hl else CREAM)
     im.save(f"{O}/q{i}.png"); return im.size
 QS = [qline(i, t_, h_) for i, (t_, h_) in enumerate(QUOTE)]
@@ -120,8 +119,8 @@ shadow(end.crop((0, 0, W, yy + 10)), blur=16, op=220).save(f"{O}/end.png")
 
 e0 = st[5]
 def fa_(a_, b_): return f"fade=t=in:st={a_:.2f}:d=0.3:alpha=1,fade=t=out:st={b_:.2f}:d=0.25:alpha=1"
-q0 = st[3]; qend = st[4] - 0.25
-cards = [("h", st[0] + 0.25, st[3] - 0.2, 760), ("s", st[4] + 0.2, st[5] - 0.1, 1300)]
+q0 = st[1] - 0.1; qend = st[4] - 0.3
+cards = [("h", st[0] + 0.25, st[1] - 0.15, 760), ("s", st[4] + 0.2, st[5] - 0.1, 760)]
 L = f"-framerate {FPS} -loop 1 -t {total:.2f}"
 names = ["wm", "bar", "logo_s", "logo_b", "end"] + [c[0] for c in cards] + [f"q{i}" for i in range(len(QUOTE))]
 ins = f"-i {S}/base.mp4 " + " ".join(f"{L} -i {O}/{n}.png" for n in names)
@@ -134,9 +133,9 @@ f = [f"[1]format=rgba,fade=t=out:st={e0:.2f}:d=0.5:alpha=1[wm]",
 cur = "a2"
 for i, (nm, a_, b_, y) in enumerate(cards):
     f.append(f"[{6+i}]format=rgba,{fa_(a_, b_)}[c{i}]"); f.append(f"[{cur}][c{i}]overlay=(W-w)/2:{y}-h/2[b{i}]"); cur = f"b{i}"
-qi0 = 6 + len(cards); LH = 152; y0 = 960 - LH * len(QUOTE) / 2
+qi0 = 6 + len(cards); LH = 152; y0 = 1380
 for i in range(len(QUOTE)):
-    ta = q0 + 0.5 + i * 0.55
+    ta = q0 + 0.5 + i * 0.7
     f.append(f"[{qi0+i}]format=rgba,fade=t=in:st={ta:.2f}:d=0.3:alpha=1,fade=t=out:st={qend:.2f}:d=0.3:alpha=1[q{i}]")
     f.append(f"[{cur}][q{i}]overlay=x='50-60*max(0\\,min(1\\,1-(t-{ta:.2f})/0.35))':y={y0 + i*LH:.0f}[r{i}]"); cur = f"r{i}"
 f += [f"[{cur}][lb]overlay=(W-w)/2:300[e1]", "[e1][en]overlay=(W-w)/2:930,format=yuv420p[v]"]
