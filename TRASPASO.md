@@ -77,3 +77,10 @@ Quedan **10 espacios** del 24 al 31. Ideas del plan anterior: Sáb 24 Reel rotul
 - Toyota Hembrita marrón: pisos 5D (Reel del 23-oct).
 - "Tufruta Mi Paquito": fiel cliente (camión de frutas, imagen del 15-oct).
 - Rifas Prestigio: Ford Fiesta azul, rotulado en proceso.
+
+## Carrusel piezas Ford Super Duty (en curso, 28-oct)
+- Portada: `piezas/proshot_ford_superduty` variante A "Frente cromado" (Higgsfield media 499bb531-198d-4c52-8dc4-4548761255d7).
+- Faro original: reel v2 (bombillo bien orientado) media 8d2191d5-275a-4ff3-b2a3-4e97988459c7. Keyframes jobs: frente fdc88d79, trasera corregida 40d02f1e, blanca 273d45b4, amarilla 484273bd.
+- Volante + tapa: reel media 5b02905c-258b-4ea5-a063-4d2edacff8ea. Keyframes: armado 37adcce9, tapa fuera 2c4c9b2a, trasera c67698c8. Cierre = clip 1 en reversa.
+- Método: gpt_image_2_5 keyframes 9:16 → minimax_h3 start/end 6 s → overlays.py + mk.sh (sandbox Higgsfield, carpetas faro/ y vol/).
+- Pendiente: más piezas, música de Samer, unir todo en carrusel (máx. 10 láminas), marcar isAiGenerated.
