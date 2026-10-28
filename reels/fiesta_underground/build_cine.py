@@ -40,45 +40,65 @@ def text(cv, cx, y, s, font, fill, sp=0, sh=True, op=200):
 
 def blank(): return Image.new("RGBA", (W, H), (0, 0, 0, 0))
 
-# barras de cine con marca (fijas)
+# barras de cine con la marca GRANDE (fijas)
+BAR = 250
 cv = blank(); dr = ImageDraw.Draw(cv)
 dr.rectangle((0, 0, W, BAR), fill=(0, 0, 0, 255)); dr.rectangle((0, H - BAR, W, H), fill=(0, 0, 0, 255))
-text(cv, W // 2, 92, "A L E X M A R", ImageFont.truetype(M9, 30), TERRA, sp=6, sh=False)
-lw = 84; lg = LOGO.resize((lw, int(LOGO.height * lw / LOGO.width)), Image.LANCZOS); cv.alpha_composite(lg, (W - lw - 36, (BAR - lg.height) // 2 + 14))
-text(cv, W // 2, H - 64, "0416-676 83 93  ·  TOVAR  ·  PUEBLO LLANO", ImageFont.truetype(M7, 22), (190, 185, 178), sp=3, sh=False)
-t = Image.new("RGBA", (1500, 420), (0, 0, 0, 0)); ImageDraw.Draw(t).text((20, 0), "ALEXMAR", font=ImageFont.truetype(ANTON, 320), fill=(255, 255, 255, 10))
+dr.rectangle((0, BAR - 6, W, BAR), fill=TERRA + (255,)); dr.rectangle((0, H - BAR, W, H - BAR + 6), fill=TERRA + (255,))
+lw = 230; lg = LOGO.resize((lw, int(LOGO.height * lw / LOGO.width)), Image.LANCZOS)
+lg, p = shadow(lg, 10, 200); cv.alpha_composite(lg, (40 - p, (BAR - 6 - (lg.height - 2 * p)) // 2 - p))
+fa = ImageFont.truetype(ANTON, 118); dr = ImageDraw.Draw(cv); bb = dr.textbbox((0, 0), "ALEXMAR", font=fa)
+x0 = 40 + lw + 34; dr.text((x0, (BAR - 6 - (bb[3] - bb[1])) // 2 - bb[1] - 10), "ALEXMAR", font=fa, fill=TERRA)
+fk = ImageFont.truetype(M9, 22); dr.text((x0 + 4, BAR - 58), "AUTOPERIQUITOS Y ROTULADOS", font=fk, fill=LIGHT)
+fp = ImageFont.truetype(ANTON, 100); s_ = "0416-676 83 93"; bb = dr.textbbox((0, 0), s_, font=fp)
+dr.text(((W - (bb[2] - bb[0])) // 2 - bb[0], H - BAR + 34 - bb[1]), s_, font=fp, fill=CREAM)
+fl = ImageFont.truetype(M9, 30); s_ = "TOVAR  ·  PUEBLO LLANO  ·  @autoalexmar_car"
+dr.text(((W - dr.textlength(s_, font=fl)) // 2, H - 78), s_, font=fl, fill=LIGHT)
+t = Image.new("RGBA", (1500, 420), (0, 0, 0, 0)); ImageDraw.Draw(t).text((20, 0), "ALEXMAR", font=ImageFont.truetype(ANTON, 320), fill=(255, 255, 255, 20))
 t = t.rotate(58, expand=True, resample=Image.BICUBIC); cv.alpha_composite(t, ((W - t.width) // 2, (H - t.height) // 2))
 cv.save(f"{TMP}/bars.png")
 
-def caption(name, s):  # subtítulo en la barra inferior
-    cv = blank(); text(cv, W // 2, H - BAR + 34, s, ImageFont.truetype(M7, 38), CREAM, sh=False); cv.save(f"{TMP}/{name}.png")
+def band(cv, y0, y1):
+    g = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(g); pad = 60
+    for yy in range(y0 - pad, y1 + pad):
+        e = min(1, (yy - (y0 - pad)) / pad, ((y1 + pad) - yy) / pad); d.line((0, yy, W, yy), fill=(8, 8, 8, int(175 * max(0, e))))
+    cv.alpha_composite(g)
 
-def title(name, kicker, big, y=760, size=150):  # título centrado en la imagen
-    cv = blank(); yy = text(cv, W // 2, y, kicker, ImageFont.truetype(M9, 34), LIGHT, sp=12, op=245) + 18
-    ImageDraw.Draw(cv).line((W // 2 - 60, yy, W // 2 + 60, yy), fill=TERRA + (255,), width=3); yy += 26
-    text(cv, W // 2, yy, big, ImageFont.truetype(ANTON, size), CREAM, sp=10, op=220); cv.save(f"{TMP}/{name}.png")
+def card(name, kicker, big, y=330, size=130, col=CREAM):  # título grande con franja oscura (como en los reels que gustaron)
+    cv = blank(); fb = ImageFont.truetype(ANTON, size); dr = ImageDraw.Draw(cv)
+    while dr.textlength(big, font=fb) + 4 * len(big) > W - 140: size -= 4; fb = ImageFont.truetype(ANTON, size)
+    h = 50 + 30 + size * 1.25; band(cv, y - 10, int(y + h))
+    yy = text(cv, W // 2, y, kicker, ImageFont.truetype(M9, 34), LIGHT, sp=10, op=230) + 14
+    ImageDraw.Draw(cv).rectangle((W // 2 - 60, yy, W // 2 + 60, yy + 6), fill=TERRA + (255,)); yy += 30
+    text(cv, W // 2, yy, big, fb, col, sp=4, op=230); cv.save(f"{TMP}/{name}.png")
 
-title("ti_open", "ALEXMAR  PRESENTA", "FORD FIESTA", y=700)
-caption("ca_1", "Instalación de luces policiales")
-caption("ca_2", "Cableado y control de las luces")
-caption("ca_3", "Luces policiales en la parrilla")
-caption("ca_4", "Cambio de bombillos amarillos por LED")
-title("ti_pol", "INSTALADAS", "LUCES POLICIALES", y=330, size=120)
-title("ti_pan", "EN EL PARABRISAS", "PANORÁMICA", y=1180, size=140)
-title("ti_led", "ADIÓS AMARILLO", "BOMBILLOS LED", y=330, size=130)
-caption("ca_5", "Luces policiales  ·  Bombillos LED  ·  Panorámica")
+def caption(name, s, y=1430):
+    card(name, "FORD  FIESTA", s, y=y, size=96, col=LIGHT)
 
-# cierre
-cv = Image.new("RGBA", (W, H), (8, 8, 8, 255)); dr = ImageDraw.Draw(cv)
-dr.rectangle((0, 0, W, BAR), fill=(0, 0, 0, 255)); dr.rectangle((0, H - BAR, W, H), fill=(0, 0, 0, 255))
-lw = 400; lg = LOGO.resize((lw, int(LOGO.height * lw / LOGO.width)), Image.LANCZOS); lg, p = shadow(lg, 16, 200)
-cv.alpha_composite(lg, ((W - lg.width) // 2, 420 - p)); y = 420 + int(LOGO.height * lw / LOGO.width) + 60
-y = text(cv, W // 2, y, "AUTOPERIQUITOS  Y  ROTULADOS", ImageFont.truetype(M9, 30), LIGHT, sp=8) + 16
-y = text(cv, W // 2, y, "ALEXMAR", ImageFont.truetype(ANTON, 200), TERRA, sp=12) + 36
-ImageDraw.Draw(cv).line((W // 2 - 220, y, W // 2 + 220, y), fill=(245, 240, 232, 140), width=2); y += 36
-y = text(cv, W // 2, y, "0416-676 83 93", ImageFont.truetype(ANTON, 100), CREAM, sp=4) + 28
-y = text(cv, W // 2, y, "Tovar  ·  Pueblo Llano", ImageFont.truetype(M7, 40), CREAM) + 14
-text(cv, W // 2, y, "Lunes a sábado 8 am a 6 pm", ImageFont.truetype(M7, 32), (200, 195, 188))
+def title(name, kicker, big, y=330, size=130):
+    card(name, kicker, big, y=y, size=size)
+
+card("ti_open", "ALEXMAR  PRESENTA", "FORD FIESTA", y=760, size=170, col=CREAM)
+caption("ca_1", "LUCES POLICIALES")
+caption("ca_2", "CABLEADO Y CONTROL")
+caption("ca_3", "LUCES EN LA PARRILLA")
+caption("ca_4", "BOMBILLOS LED")
+title("ti_pol", "INSTALADAS", "LUCES POLICIALES", y=320, size=130)
+title("ti_pan", "EN EL PARABRISAS", "PANORÁMICA", y=1180, size=150)
+title("ti_led", "ADIÓS AMARILLO", "BOMBILLOS LED", y=320, size=140)
+caption("ca_5", "POLICIALES · LED · PANORÁMICA", y=1380)
+
+# cierre (logo grande y nombre bien visible)
+cv = Image.new("RGBA", (W, H), (10, 10, 10, 255)); dr = ImageDraw.Draw(cv)
+lw = 600; lg = LOGO.resize((lw, int(LOGO.height * lw / LOGO.width)), Image.LANCZOS); lg, p = shadow(lg, 18, 210)
+cv.alpha_composite(lg, ((W - lg.width) // 2, 230 - p)); y = 230 + int(LOGO.height * lw / LOGO.width) + 50
+y = text(cv, W // 2, y, "AUTOPERIQUITOS  Y  ROTULADOS", ImageFont.truetype(M9, 38), CREAM, sp=8) + 14
+y = text(cv, W // 2, y, "ALEXMAR", ImageFont.truetype(ANTON, 230), TERRA, sp=12) + 30
+ImageDraw.Draw(cv).rectangle((W // 2 - 90, y, W // 2 + 90, y + 6), fill=LIGHT + (255,)); y += 40
+y = text(cv, W // 2, y, "0416-676 83 93", ImageFont.truetype(ANTON, 130), CREAM, sp=4) + 30
+y = text(cv, W // 2, y, "Tovar  ·  Pueblo Llano", ImageFont.truetype(M7, 46), CREAM) + 14
+y = text(cv, W // 2, y, "Lunes a sábado  ·  8 am a 6 pm", ImageFont.truetype(M7, 40), CREAM) + 14
+text(cv, W // 2, y, "@autoalexmar_car", ImageFont.truetype(M9, 40), LIGHT)
 cv.convert("RGB").save(f"{TMP}/end.png")
 
 # 1) segmentos (mismo tamaño y fps)
