@@ -1,0 +1,128 @@
+"""Reel estilo cine ALEXMAR: Ford Fiesta con luces policiales, bombillos LED (antes amarillos) y panorámica.
+1080x1920, barras de cine, sin audio. Uso: python build_cine.py <dir_clips c1..c4.mp4> <salida.mp4>"""
+import os, sys, subprocess
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+SRC, OUT = sys.argv[1], sys.argv[2]
+D = os.path.dirname(os.path.abspath(__file__)); R = os.path.join(D, "..", "..", "plantillas")
+ANTON = f"{R}/fonts/Anton.ttf"; M9 = f"{R}/fonts/Mont900.ttf"; M7 = f"{R}/fonts/Mont700.ttf"
+TERRA = (217, 119, 87); LIGHT = (240, 165, 126); CREAM = (245, 240, 232)
+W, H, BAR = 1080, 1920, 190
+LOGO = Image.open(f"{R}/assets/logo_alexmar_sticker.png").convert("RGBA"); LOGO = LOGO.crop(LOGO.getbbox())
+TMP = os.path.join(SRC, "_cine"); os.makedirs(TMP, exist_ok=True)
+XF = 0.3  # duración de cada fundido
+
+# (clip, inicio, duración de fuente, velocidad, recorte opcional "w:h:x:y")
+SEG = [("c4", 0.4, 1.7, 1.0, None),          # 0 emblema Ford
+       ("c1", 0.4, 1.9, 1.0, None),          # 1 trabajando la pieza
+       ("c2", 2.6, 1.5, 1.0, None),          # 2 control y cableado
+       ("c3", 0.6, 1.9, 1.0, None),          # 3 manos en la parrilla
+       ("c2", 12.4, 1.5, 1.0, None),         # 4 debajo del parachoques
+       ("c1", 6.0, 1.4, 1.0, None),          # 5 frente del carro
+       ("c4", 1.6, 1.9, 0.65, None),         # 6 se encienden las luces policiales (lento)
+       ("c4", 2.7, 1.3, 0.7, "540:960:270:40"),  # 7 panorámica (acercamiento al parabrisas)
+       ("c4", 4.2, 2.6, 0.85, None),         # 8 bombillos LED
+       ("c4", 9.0, 3.2, 1.0, None)]          # 9 sale el Fiesta
+END = 3.2
+
+def shadow(im, blur=10, op=200, off=(0, 4)):
+    pad = blur * 3; base = Image.new("RGBA", (im.width + pad * 2, im.height + pad * 2), (0, 0, 0, 0))
+    a = im.split()[3].point(lambda v: v * op // 255); blk = Image.new("RGBA", im.size, (0, 0, 0, 255)); blk.putalpha(a)
+    sh = Image.new("RGBA", base.size, (0, 0, 0, 0)); sh.paste(blk, (pad + off[0], pad + off[1]), blk)
+    sh = sh.filter(ImageFilter.GaussianBlur(blur)); base.alpha_composite(sh); base.alpha_composite(im, (pad, pad)); return base, pad
+
+def text(cv, cx, y, s, font, fill, sp=0, sh=True, op=200):
+    dr = ImageDraw.Draw(cv); w = sum(dr.textlength(c, font=font) for c in s) + sp * (len(s) - 1)
+    lay = Image.new("RGBA", (int(w) + 40, int(font.size * 1.6)), (0, 0, 0, 0)); ld = ImageDraw.Draw(lay); xx = 20
+    for c in s: ld.text((xx, 10), c, font=font, fill=fill + (255,)); xx += ld.textlength(c, font=font) + sp
+    lay = lay.crop(lay.getbbox()); p = 0
+    if sh: lay, p = shadow(lay, 10, op)
+    cv.alpha_composite(lay, (int(cx - lay.width // 2), int(y - p))); return y + lay.height - 2 * p
+
+def blank(): return Image.new("RGBA", (W, H), (0, 0, 0, 0))
+
+# barras de cine con marca (fijas)
+cv = blank(); dr = ImageDraw.Draw(cv)
+dr.rectangle((0, 0, W, BAR), fill=(0, 0, 0, 255)); dr.rectangle((0, H - BAR, W, H), fill=(0, 0, 0, 255))
+text(cv, W // 2, 92, "A L E X M A R", ImageFont.truetype(M9, 30), TERRA, sp=6, sh=False)
+lw = 84; lg = LOGO.resize((lw, int(LOGO.height * lw / LOGO.width)), Image.LANCZOS); cv.alpha_composite(lg, (W - lw - 36, (BAR - lg.height) // 2 + 14))
+text(cv, W // 2, H - 64, "0416-676 83 93  ·  TOVAR  ·  PUEBLO LLANO", ImageFont.truetype(M7, 22), (190, 185, 178), sp=3, sh=False)
+t = Image.new("RGBA", (1500, 420), (0, 0, 0, 0)); ImageDraw.Draw(t).text((20, 0), "ALEXMAR", font=ImageFont.truetype(ANTON, 320), fill=(255, 255, 255, 10))
+t = t.rotate(58, expand=True, resample=Image.BICUBIC); cv.alpha_composite(t, ((W - t.width) // 2, (H - t.height) // 2))
+cv.save(f"{TMP}/bars.png")
+
+def caption(name, s):  # subtítulo en la barra inferior
+    cv = blank(); text(cv, W // 2, H - BAR + 34, s, ImageFont.truetype(M7, 38), CREAM, sh=False); cv.save(f"{TMP}/{name}.png")
+
+def title(name, kicker, big, y=760, size=150):  # título centrado en la imagen
+    cv = blank(); yy = text(cv, W // 2, y, kicker, ImageFont.truetype(M9, 34), LIGHT, sp=12, op=245) + 18
+    ImageDraw.Draw(cv).line((W // 2 - 60, yy, W // 2 + 60, yy), fill=TERRA + (255,), width=3); yy += 26
+    text(cv, W // 2, yy, big, ImageFont.truetype(ANTON, size), CREAM, sp=10, op=220); cv.save(f"{TMP}/{name}.png")
+
+title("ti_open", "ALEXMAR  PRESENTA", "FORD FIESTA", y=700)
+caption("ca_1", "Instalación de luces policiales")
+caption("ca_2", "Cableado y control de las luces")
+caption("ca_3", "Luces policiales en la parrilla")
+caption("ca_4", "Cambio de bombillos amarillos por LED")
+title("ti_pol", "INSTALADAS", "LUCES POLICIALES", y=330, size=120)
+title("ti_pan", "EN EL PARABRISAS", "PANORÁMICA", y=1180, size=140)
+title("ti_led", "ADIÓS AMARILLO", "BOMBILLOS LED", y=330, size=130)
+caption("ca_5", "Luces policiales  ·  Bombillos LED  ·  Panorámica")
+
+# cierre
+cv = Image.new("RGBA", (W, H), (8, 8, 8, 255)); dr = ImageDraw.Draw(cv)
+dr.rectangle((0, 0, W, BAR), fill=(0, 0, 0, 255)); dr.rectangle((0, H - BAR, W, H), fill=(0, 0, 0, 255))
+lw = 400; lg = LOGO.resize((lw, int(LOGO.height * lw / LOGO.width)), Image.LANCZOS); lg, p = shadow(lg, 16, 200)
+cv.alpha_composite(lg, ((W - lg.width) // 2, 420 - p)); y = 420 + int(LOGO.height * lw / LOGO.width) + 60
+y = text(cv, W // 2, y, "AUTOPERIQUITOS  Y  ROTULADOS", ImageFont.truetype(M9, 30), LIGHT, sp=8) + 16
+y = text(cv, W // 2, y, "ALEXMAR", ImageFont.truetype(ANTON, 200), TERRA, sp=12) + 36
+ImageDraw.Draw(cv).line((W // 2 - 220, y, W // 2 + 220, y), fill=(245, 240, 232, 140), width=2); y += 36
+y = text(cv, W // 2, y, "0416-676 83 93", ImageFont.truetype(ANTON, 100), CREAM, sp=4) + 28
+y = text(cv, W // 2, y, "Tovar  ·  Pueblo Llano", ImageFont.truetype(M7, 40), CREAM) + 14
+text(cv, W // 2, y, "Lunes a sábado 8 am a 6 pm", ImageFont.truetype(M7, 32), (200, 195, 188))
+cv.convert("RGB").save(f"{TMP}/end.png")
+
+# 1) segmentos (mismo tamaño y fps)
+durs = []
+for i, (c, ss, d, sp, crop) in enumerate(SEG):
+    vf = (f"crop={crop}," if crop else "") + f"setpts=PTS/{sp},scale=1080:1920,fps=30,setsar=1"
+    if i in (0, 6, 9): vf += ",zoompan=z='1+0.0018*on':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps=30"
+    subprocess.check_call(["ffmpeg", "-v", "error", "-y", "-ss", str(ss), "-t", str(d), "-i", f"{SRC}/{c}.mp4", "-an", "-vf", vf,
+                           "-c:v", "libx264", "-crf", "15", "-preset", "fast", f"{TMP}/s{i}.mp4"])
+    durs.append(float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", f"{TMP}/s{i}.mp4"])))
+
+# 2) cadena de fundidos
+inp = []; fc = []
+for i in range(len(SEG)): inp += ["-i", f"{TMP}/s{i}.mp4"]
+starts = [0.0]; off = durs[0] - XF; prev = "0:v"
+for i in range(1, len(SEG)):
+    fc.append(f"[{prev}][{i}:v]xfade=transition=fade:duration={XF}:offset={off:.3f}[x{i}]"); prev = f"x{i}"
+    starts.append(off); off += durs[i] - XF
+MAIN = off + XF
+subprocess.check_call(["ffmpeg", "-v", "error", "-y", *inp, "-filter_complex", ";".join(fc), "-map", f"[{prev}]",
+                       "-c:v", "libx264", "-crf", "15", "-preset", "fast", f"{TMP}/chain.mp4"])
+
+# 3) color de cine + barras + textos + cierre
+s = starts
+ovl = [("ti_open", 0.2, s[1]), ("ca_1", s[1] + 0.2, s[2] + 0.1), ("ca_2", s[2] + 0.2, s[3] + 0.1), ("ca_3", s[3] + 0.2, s[5] + 0.1),
+       ("ca_4", s[5] + 0.2, s[6] + 0.1), ("ti_pol", s[6] + 1.0, s[7] + 0.1), ("ti_pan", s[7] + 0.25, s[8] + 0.1),
+       ("ti_led", s[8] + 0.3, s[9] + 0.1), ("ca_5", s[9] + 0.3, MAIN)]
+inputs = ["-i", f"{TMP}/chain.mp4", "-loop", "1", "-t", f"{MAIN:.2f}", "-i", f"{TMP}/bars.png"]
+for n, _, _ in ovl: inputs += ["-loop", "1", "-t", f"{MAIN:.2f}", "-i", f"{TMP}/{n}.png"]
+inputs += ["-loop", "1", "-t", f"{END}", "-i", f"{TMP}/end.png"]
+fc = ["[0:v]eq=contrast=1.12:saturation=0.82:gamma=0.97,"
+      "colorbalance=rs=-0.06:gs=-0.01:bs=0.07:rm=0.02:bm=-0.02:rh=0.07:gh=0.02:bh=-0.06,"
+      "curves=master='0/0.04 0.25/0.21 0.75/0.78 1/0.96',noise=alls=5:allf=t,vignette=PI/5,format=rgba[g]",
+      "[g][1:v]overlay=0:0[b0]"]
+last = "b0"
+for k, (n, a, b) in enumerate(ovl):
+    d = b - a
+    fc.append(f"[{k + 2}:v]format=rgba,trim=0:{d:.2f},fade=in:st=0:d=0.35:alpha=1,fade=out:st={max(0.1, d - 0.35):.2f}:d=0.35:alpha=1,setpts=PTS-STARTPTS+{a:.2f}/TB[o{k}]")
+    fc.append(f"[{last}][o{k}]overlay=0:0:eof_action=pass[b{k + 1}]"); last = f"b{k + 1}"
+e = len(ovl) + 2
+fc.append(f"[{last}]trim=0:{MAIN:.2f},setpts=PTS-STARTPTS,fps=30,format=yuv420p,settb=1/30[m]")
+fc.append(f"[{e}:v]scale=1080:1920,fps=30,format=yuv420p,settb=1/30[en]")
+fc.append(f"[m][en]xfade=transition=fadeblack:duration=0.6:offset={MAIN - 0.6:.2f},format=yuv420p[v]")
+subprocess.check_call(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex", ";".join(fc), "-map", "[v]",
+                       "-c:v", "libx264", "-crf", "20", "-preset", "medium", "-maxrate", "14M", "-bufsize", "28M",
+                       "-pix_fmt", "yuv420p", "-movflags", "+faststart", OUT])
+print("ok", OUT, "dur≈", round(MAIN - 0.6 + END, 2), "inicios:", [round(x, 2) for x in starts])
