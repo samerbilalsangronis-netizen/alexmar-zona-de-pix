@@ -85,3 +85,4 @@ Quedan **10 espacios** del 24 al 31. Ideas del plan anterior: Sáb 24 Reel rotul
 - Método: gpt_image_2_5 keyframes 9:16 → minimax_h3 start/end 6 s → overlays.py + mk.sh (sandbox Higgsfield, carpetas faro/ y vol/).
 - Pendiente: más piezas, música de Samer, unir todo en carrusel (máx. 10 láminas), marcar isAiGenerated.
 - Fusilera: reel media 77261846-6032-42f4-b689-eaded9d0f086 (17 s). Keyframes: armada 72d53914 (sin tarjeta SecuriCode), fusibles fuera b45287dc. Clip + reversa. Ojo: la foto original trae el código de acceso del vehículo; en el repo quedó difuminado.
+- Parrillas (Super Duty negra original / Super Duty cromada / Tritón): reel media 97d27dfc-90b1-4201-9080-4d8644159854 (17 s). Keyframes 7deefafd (armadas), 4e5cfb50 (emblemas fuera). La negra no trae emblema en la foto: no se le inventó.
