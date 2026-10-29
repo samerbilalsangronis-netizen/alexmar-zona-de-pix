@@ -26,7 +26,7 @@ def build(W, H, out, story=False):
     ph = Image.open(SRC).convert("RGB")
     ph = ImageEnhance.Contrast(ph).enhance(1.08); ph = ImageEnhance.Color(ph).enhance(1.08)
     s = max(W / ph.width, H / ph.height); ph = ph.resize((round(ph.width * s), round(ph.height * s)), Image.LANCZOS)
-    x0 = (ph.width - W) // 2; y0 = (ph.height - H) // 2
+    x0 = int(min(max(ph.width * (0.62 if story else 0.5) - W / 2, 0), ph.width - W)); y0 = (ph.height - H) // 2
     cv = ph.crop((x0, y0, x0 + W, y0 + H)).convert("RGBA")
     # degradado arriba para la frase sobre el cielo
     g = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(g); g1 = int(H * 0.50)
@@ -45,8 +45,8 @@ def build(W, H, out, story=False):
     dr.text((x1 + 4, TOP - 52), "AUTOPERIQUITOS Y ROTULADOS", font=ImageFont.truetype(M9, 21 if not story else 23), fill=LIGHT)
     # frase
     y = TOP + (50 if not story else 90)
-    y = text(cv, 56, y, "MENTE OCUPADA,", ImageFont.truetype(ANTON, 118 if not story else 132), CREAM, sp=2) + 8
-    y = text(cv, 56, y, "MANOS TRABAJANDO.", ImageFont.truetype(ANTON, 118 if not story else 132), TERRA, sp=2) + 22
+    y = text(cv, 56, y, "MENTE OCUPADA,", ImageFont.truetype(ANTON, 118 if not story else 116), CREAM, sp=2) + 8
+    y = text(cv, 56, y, "MANOS TRABAJANDO.", ImageFont.truetype(ANTON, 118 if not story else 116), TERRA, sp=2) + 22
     dr = ImageDraw.Draw(cv); dr.rectangle((60, y, 200, y + 7), fill=CREAM + (255,)); y += 30
     text(cv, 58, y, "En ALEXMAR no paramos: siempre hay un carro", ImageFont.truetype(M7, 34 if not story else 38), CREAM, op=240)
     text(cv, 58, y + (48 if not story else 54), "esperando quedar mejor.", ImageFont.truetype(M7, 34 if not story else 38), CREAM, op=240)
