@@ -1,93 +1,70 @@
-# TRASPASO — Publicidad ALEXMAR (actualizado martes 20-oct-2026, 5:30 pm)
+# TRASPASO — Publicidad ALEXMAR (actualizado viernes 30-oct-2026, 4:00 pm)
 
 Leer esto al empezar un chat nuevo del proyecto. Las reglas generales (rol, paleta, formatos, textos) están en las instrucciones del proyecto y en la "ficha alexmar".
 
 ## 0. Al empezar el chat nuevo
-1. Agregar el repositorio **samerbilalsangronis-netizen/alexmar-zona-de-pix** con permiso de escritura y clonar solo la rama **`publicidad`** (`git clone --depth 1 --branch publicidad --single-branch …`). No tocar main.
-2. Revisar en Metricool (brand 7455167) qué hay programado del 21 al 31 de octubre y cuántas publicaciones quedan (sección 2).
-3. **Jueves 22:** revisar el resultado del RETO de luces laterales (reel del miércoles 21): meta **30 me gusta + 15 compartidos**. Si llegó, pedirle a Samer los precios nuevos y armar la pieza de la promoción (precios más bajos en luces laterales LED para camiones).
-4. Preguntar: qué ganó la votación del rotulado de la rifa (A o B), si Scorpion aceptó la colaboración, y si ya configuró las respuestas automáticas de Meta (sección 5).
+1. Agregar el repositorio **samerbilalsangronis-netizen/alexmar-zona-de-pix** con permiso de escritura y clonar solo la rama **`publicidad`** (`git clone --depth 1 --branch publicidad --single-branch …`). No tocar main. Si el push falla: `git pull --rebase origin publicidad` y volver a empujar.
+2. Revisar en Metricool (brand 7455167) qué hay programado de noviembre (el plan Free da 20 publicaciones al mes; noviembre empieza en cero).
+3. Preguntar a Samer por los pendientes de la sección 5.
 
 ## 1. Reglas acordadas (además de las instrucciones del proyecto)
-- **Solo Instagram** (@autoalexmar_car). No hacer versiones de WhatsApp. Posts y carruseles en 1080x1350; historias y Reels en 1080x1920.
-- **Videos:** se entregan **sin audio**. Samer pone la música (CapCut/TikTok), lo devuelve, y recién ahí se programa en Metricool con publicación automática. No usar música del catálogo de Instagram.
-- **No inventar nada:** los Reels se arman **solo con sus fotos y videos reales**. No usar tomas de IA salvo que lo pida. Si se usan, marcar `isAiGenerated: true`.
-- **Textos dentro del video:** cortos, con sentido y descriptivos (el nombre de lo que se instaló: "BARRA LED", "ANTENA PCTEL"...). Rechazó "Luces que se notan" por no tener sentido. Le gustan las frases elegantes/épicas al final ("No es solo una camioneta, es tu carta de presentación", "Los detalles hacen la diferencia").
-- **Enfocar el trabajo hecho:** acercamientos (punch-in) a cada pieza instalada, con foco/viñeta alrededor; en fotos se puede realzar el brillo solo de las luces reales.
-- **Historias nunca "secas":** video de 12 s con zoom suave y sin audio + imagen. Indicar sticker y 2–3 hashtags. Las sube Samer a mano.
-- Antes de programar, **mostrarle el texto completo con hashtags**. Si Samer manda el video con música y dice "prográmalo", se puede programar directo y mostrar el texto después (puede pedir cambios).
-- Clientes: "nuestro fiel cliente" + nombre en piezas normales. **En piezas de PROMOCIÓN no va el nombre del cliente.** No inventar el trabajo hecho.
-- Horario en publicidad: **lunes a sábado, 8 am a 6 pm**.
-- Direcciones: **Tovar:** Carrera 4ta, El Llano, diagonal a LM Market. **Pueblo Llano (sede):** C-9, sector La Curva de Los Luises. Envíos a todo el país por MRW y Zoom.
+- **Solo Instagram** (@autoalexmar_car). No hacer versiones de WhatsApp. Posts y carruseles en 1080x1350; historias y Reels en 1080x1920. Si no dice formato: post + historia.
+- **Videos:** se entregan **sin audio**. Samer pone la música (CapCut), lo devuelve y dice "programa"; ahí se programa en Metricool con publicación automática. Si no da hora, usar 10:00 am (o 1:00 pm si ya hay algo ese día).
+- **LA MARCA VA GRANDE (regla más importante, 28-oct):** en todo video, barra negra arriba con **logo grande + ALEXMAR en naranja + "Autoperiquitos y Rotulados"**, y barra abajo con **0416-676 83 93 grande** + "Tovar · Pueblo Llano · @autoalexmar_car", líneas naranjas separando las barras. Marca de agua ALEXMAR diagonal. Cierre con logo gigante. Samer se molestó ("todo chiquitico") cuando la marca iba pequeña.
+- **Títulos dentro del video:** grandes (Anton 120–190 px) sobre franja oscura, con kicker pequeño espaciado arriba y rayita naranja. Deben decir **exactamente lo que se instaló o el producto** (LUCES POLICIALES, BOMBILLOS LED, PANORÁMICA, PISOS DELANTEROS…). Rechazó frases genéricas ("Sin filtro", "Manos a la obra", "Luces que se notan").
+- **Estilos:** RECHAZÓ el estilo underground/glitch (destellos, RGB, temblor, grano fuerte, REC). APROBÓ el estilo "cine" (barras, color cálido suave, fundidos) y el de "llegando mercancía" (cortes rápidos ~2 s, títulos que cambian, lista de modelos saltando en cintas naranja/crema). Para antes/después: "ANTES · Así llegó" / "DESPUÉS · Bandejas 5D".
+- **Mejorar calidad** cuando los videos vienen malos/quemados por el sol: hqdn3d + curves (bajar altas luces) + eq gamma 0.94 + unsharp; reescalar lanczos. Videos de WhatsApp llegan a 360x640 o 720x1280; algunos llegan acostados (rotar con transpose=1).
+- **No inventar** especificaciones, precios ni disponibilidad. Las tomas de IA solo si las pide o en piezas de producto; si se usan, `isAiGenerated: true`.
+- **Piezas con IA (Higgsfield):** Samer pidió "sorpréndeme" y le gustó la escena IA de la sede con billetes volando, PERO dijo que me pasé con montañas "mitológicas": mantener el entorno **realista** (montañas verdes reales de los Andes, cielo natural) y solo agregar el elemento creativo.
+- Antes de programar, mostrar el texto completo con hashtags (si dice "prográmalo" se programa directo y se muestra después).
+- Clientes: "nuestro fiel cliente" + nombre en piezas normales; **en promociones no va el nombre**. Preguntar si se difuminan placas.
+- Horario: **lunes a sábado, 8 am a 6 pm**. Direcciones: **Tovar:** Carrera 4ta, El Llano, diagonal a LM Market. **Pueblo Llano (sede):** C-9, sector La Curva de Los Luises. Envíos por MRW y Zoom.
 - Productos Scorpion: colaborador **@scorpions_vzla**.
-- Pedirle los videos **como documento por WhatsApp o por Drive** (los normales llegan a 360x640).
-- Cuando use Higgsfield, **informar los créditos gastados** de cada acción.
-- **Rotulados:** primero propuestas sobre fotos reales; diseño por capas de color después de que Samer escoja.
+- Informar siempre los **créditos de Higgsfield** gastados y el saldo.
 
-## 2. Herramientas
-- **Metricool:** brand id **7455167**, zona America/Caracas. Plan Free, **20 publicaciones al mes**. Octubre: **10 usadas, quedan 10** (para el 24–31). Hay un borrador viejo de historia (EXR, 17-oct) que Samer debe borrar desde la app (si Metricool lo cuenta, quedan 10).
-- **Medios para Metricool:** subir al repo y usar el raw `https://raw.githubusercontent.com/samerbilalsangronis-netizen/alexmar-zona-de-pix/publicidad/<ruta>`.
-- **Higgsfield:** plan **Plus** pagado el 18-oct (1.000 créditos/mes, 49 €). Saldo ≈ **991 créditos**. Referencia: voz ~1,2 cr; video IA Kling 3.0 Pro 5 s ~8,75 cr; clonar voz 40 cr (falló con notas de WhatsApp y se reembolsó). Limitación: desde el chat no se pueden subir archivos a Higgsfield ni bajar sus resultados; Samer tiene que subir el material con la ventanita de Higgsfield. Por eso la edición normal se hace aquí con ffmpeg/Pillow.
-- **Edición:** ffmpeg + Pillow aquí; el video se manda directo al chat. Fuentes Anton/Montserrat (npm @fontsource).
-- **Respuestas a DMs/comentarios:** Claude no tiene acceso. Metricool (con este conector) no lee ni responde. Claude en Chrome solo funciona con la PC de Samer encendida. Opción recomendada: **respuestas automáticas gratis de Meta Business Suite** (bienvenida, ausencia, 4 FAQ, 5 palabras clave, comentario→DM "LUCES" del reto). Los textos ya se le mandaron el 19-oct a las 9 pm. Alternativa con IA: ManyChat Pro (39 $/mes).
-- **Alarmas:** herramienta del teléfono (Android), solo con la app de Claude abierta. Samer las borra a mano.
+## 2. Herramientas y flujo técnico
+- **Metricool:** brand **7455167**, America/Caracas. Medios por raw de GitHub: `https://raw.githubusercontent.com/samerbilalsangronis-netizen/alexmar-zona-de-pix/<commit o publicidad>/<ruta>` (también acepta URLs cloudfront de Higgsfield). Carrusel = `instagramData.type POST` con varias medias (imágenes y videos); el audio de catálogo solo aplica a REEL.
+- **Higgsfield (plan Plus):** saldo **≈641 créditos** (30-oct). Imagen gpt_image_2_5 2k ≈2,75–3 cr; video minimax_h3 6 s con start/end ≈12 cr; música sonilo_music 20 s ≈1,25 cr.
+  - Subir fotos: push al repo → `media_import_url` con el raw.
+  - Bajar resultados: el entorno local NO puede descargar de cloudfront (403); se trabaja en `sandbox_exec` (tiene ffmpeg, Pillow, ImageMagick) y para entregar se sube con `media_upload` + `curl PUT` + `media_confirm` y se le da el enlace `d2ol7oe51mr4n9.cloudfront.net/...`.
+  - El sandbox a veces da error 502 en esperas largas: usar `background: true` y revisar el log.
+  - ImageMagick: capas PNG vacías con `PNG32:` (si no salen negras).
+- **Archivos al chat:** `SendUserFile`. Si a Samer no le descarga, mandar versión liviana (crf 23, maxrate 6M, ~19 MB) y el enlace raw de GitHub.
+- **Fuentes:** `plantillas/fonts/` Anton, Mont700, Mont900, **Montserrat-VF** (variable: Regular/ExtraBold…), **GreatVibes** (firma manuscrita).
+- **Skill /proshot** creada (foto de producto de estudio con IA + diseño ALEXMAR).
 
-## 3. Reels de Metricool (feed) — octubre
-| Fecha | Hora | Reel | Estado |
+## 3. Publicaciones recientes en Metricool
+| Fecha | Hora | Pieza | Estado |
 |---|---|---|---|
-| Vie 16 | 10:00 am | Pisos 5D | Publicado |
-| Sáb 17 | 10:00 am | F-250 Scorpion (@endersonfabianflorez), tomas IA, colaborador @scorpions_vzla | Publicado |
-| Dom 18 | 12:00 pm | Aveo interior, tomas IA | Publicado |
-| Lun 19 | 11:30 am | Ford Cargo 1721 de Nixon, iluminación LED | Publicado |
-| Mar 20 | 1:00 pm | Alfombras tipo bandeja Scorpion, colaborador @scorpions_vzla | Programado |
-| Mié 21 | 10:00 am | **RETO luces laterales**: Cargo 1721 luces LED (sin nombre de cliente). Meta 30 me gusta + 15 compartidos → bajamos precios de luces laterales LED para camiones. `reels/cargo1721_luces_led/` | Programado |
-| Jue 22 | 10:00 am | **Toyota Merú**: luces de policía (rojo/azul en parrilla), panorámica LED morada, antena PCTEL, antena australiana, portaplacas ahumado, arreglo de placas. Sin nombre de cliente. `reels/meru_policia/` | Programado |
-| Vie 23 | 10:00 am | **Pisos 5D Toyota Hembrita** (Land Cruiser pickup). `reels/bandejas5d_hembrita/` | Programado |
-| Sáb 24 | 10:00 am | **Ford Sport Trac** (Tovar): pantalla Pioneer 9" Android (DAH-9250), cámara de retroceso, bombillos LED. Gancho "¿Tu camioneta ya tiene pantalla?", tomas del equipo trabajando. Sin nombres ni @ (Samer no quiere mencionar a nadie del equipo). `reels/sporttrac_pioneer/` | Programado |
+| Lun 26 | 10:25 | Hilux 2025 bandejas 5D | Publicado |
+| Mar 27 | 10:00 | Scorpion K150 Corolla (collab @scorpions_vzla) | Publicado |
+| Mié 28 | 10:00 | Luces LED Super Duty | Publicado |
+| Jue 29 | 10:00 | F-350 con animación (IA) | Publicado |
+| Vie 30 | 10:00 | **Carrusel "Todo para tu Super Duty"** (7 láminas, IA) id 409357121 | Publicado |
+| Vie 30 | 1:00 pm | **Reel "¡Llegaron las bandejas!"** id 411282406 | Publicado |
+| Sáb 31 | 10:00 | **Reel Ford Fiesta estilo cine** (luces policiales, LED, panorámica) id 409428250 | Programado |
 
-Quedan **10 espacios** del 24 al 31. Ideas del plan anterior: Sáb 24 Reel rotulado rifa (segundo del día) · Dom 25 trabajos de la semana · Lun 26 carro de la rifa terminado · Mar 27 pisos 5D (listo en posts/) · Mié 28 educativo · Jue 29 rifa últimos tickets · Vie 30 Reel + promo · Sáb 31 lo mejor del mes · promo luces laterales si se cumple el reto. Mejor hora según Metricool: **10 am** (también 6 pm).
+## 4. Piezas listas SIN programar (preguntar a Samer cuándo)
+- **Toyota Meru bandejas 5D, antes/después** (`reels/meru_bandejas5d/`, script `build_meru.py`, liviano `alexmar_meru_5d_liviano.mp4`). Esperando que Samer le ponga música y lo devuelva. No había toma de la maletera con bandeja puesta (solo el antes).
+- **"Hasta que nademos entre los verdes" – sede Pueblo Llano** (post + historia, escena IA realista con billetes volando): `piezas/sede_pueblo_llano_verdes/verdes_pro.py`. Versión vigente v3: post `c101d01a-1e69-4327-b0a6-c370b73eb24d`, historia `d65040f7-6ace-4d3d-b948-b59816a09bc4` (cloudfront d2ol7oe51mr4n9). Fondos IA jobs 0c4081d5 (4:5) y eb7d361f (9:16). Marcar isAiGenerated.
+- **"Mente ocupada, manos trabajando"** (post + historia, sin el señor de franela azul, editada con IA): `piezas/mente_ocupada/`. Post `98113689-2220-41f5-9358-56fa3827e9a9`, historia `774937df-4776-4413-8c78-a981822e4d01`. Se ven placas (preguntó si difuminar: sin respuesta).
+- **"¡Llegó mercancía!"** (camión descargando + forros Scorpions, plumillas, forros de volante): `reels/llegando_mercancia/alexmar_llegando_mercancia.mp4`, esperando música.
+- Exploradoras, faro, volante, fusilera, parrillas Super Duty (reels individuales 9:16) ya usados en el carrusel; se pueden reutilizar como reels sueltos.
 
-## 4. Historias (las sube Samer a mano)
-- Mié 21, 10:15 am: compartir el Reel del RETO con avión de papel + "¡Ayúdanos a llegar a la meta!".
-- Jue 22, 10:15 am: compartir Reel Merú. Vie 23, 10:15 am: compartir Reel Hembrita. Sáb 24, 10:15 am: compartir Reel Sport Trac.
-- Las alarmas semanales viejas (dom/lun/mar 7:20 am, 11:35, 11:45, 1:05, 1:15, 7:20 pm) hay que borrarlas.
+## 5. Pendientes / dudas abiertas
+- Confirmar nombres de modelos de bandejas: **"Ekaizen"** (¿qué modelo?), **"Machito LS79"** (¿LC79?), **"Terios Vigo"**. Ya salieron así en el reel del 30-oct.
+- Si tiene toma de la maletera de la Meru con la bandeja, meterla en el "después".
+- Placas visibles en Fiesta, mente ocupada y Meru: Samer no ha dicho si difuminar.
+- Viejos: voto rotulado rifa (A/B), respuestas automáticas de Meta, reel "Rumbo a Pueblo Llano" (nunca mandó videos), clonar la voz de Samer (30–60 s de audio limpio, ~40 cr).
 
-## 5. Pendientes
-- **Reto luces laterales:** revisar el jueves 22; si se cumple, pieza de promo con precios que dé Samer (no inventar precios).
-- **Respuestas automáticas de Meta:** confirmar si Samer las configuró con los textos del 19-oct.
-- **Merú:** si el dueño tiene Instagram o se confirma la sede (parece Tovar), actualizar el post del jueves en Metricool.
-- **Rifa (Rifas Prestigio):** Ford Fiesta azul, rotulado solo en vidrios, verde reflectivo + blanco, negro y tornasol. Propuestas A y B en `rotulados/rifa_prestigio/`. Falta que Samer escoja, los datos del cliente y el diseño por capas.
-- **Reel "Rumbo a Pueblo Llano":** Samer nunca mandó los videos.
-- Si el dueño del Aveo o Nixon tienen Instagram, agregarlos con @.
-
-## 6. Archivos (repo alexmar-zona-de-pix, rama `publicidad`)
-- `plantillas/`: `overlays_reel.py`, `cliente.py`, `historias_semana.py`, `rifa_votacion.py`, `make.py`, `cover.py`, `reel.py`, `fonts/`, `assets/logo_alexmar_sticker.png`.
-- `reels/<trabajo>/`: versión sin audio, con audio y scripts. Carpetas: `scorpion_f250`, `aveo_interior`, `cargo1721_nixon`, `alfombras_scorpion`, `cargo1721_luces_led`, `meru_policia`, `bandejas5d_hembrita`.
-- Plantilla de montaje más reciente: `reels/meru_policia/build_meru.py` + `ov_meru.py` (funciones `vid_punch` = acercamiento en video con centro y zoom; `photo_punch` = acercamiento en foto con foco; `still_full`; xfade encadenado; tarjetas de texto con banda oscura; logo, marca de agua, barra con ALEXMAR y teléfono abajo; cierre con logo grande, teléfono, horario y sedes).
-- `rotulados/rifa_prestigio/`, `historias/`, `piezas/`.
-- **Estilo de montaje que le gusta:** (desde el Sport Trac) más rítmico: frase gancho al inicio, cortes de 1,6–2,4 s, xfade rápidos 0.15–0.25 s (fadewhite, hlslice, radial, zoomin, smoothleft, hblur) y golpe de zoom al inicio de cada toma (`kick` en `vid_punch`); recortar tiempos muertos de los videos. Plantilla: `reels/sporttrac_pioneer/build_sporttrac.py`. Antes: cortes de 2–3 s, transiciones xfade 0.3–0.45 s (fadewhite como destello, zoomin, smoothleft, smoothup, circleopen, slideleft, fadeblack), color con contraste 1.10–1.12 y saturación 1.18–1.22, textos arriba (y=400) para no tapar el trabajo, frase épica abajo (y≈1250), duración 22–27 s.
+## 6. Plantillas de montaje (repo, rama `publicidad`)
+- **Plantilla vigente para reels con la marca grande:** `reels/llegando_mercancia/build_mercancia.py` y derivadas `reels/bandejas_llegando/build_bandejas.py` (lista de modelos en cintas que saltan) y `reels/meru_bandejas5d/build_meru.py` (antes/después + mejora de calidad + rotación). Uso: `python build_X.py <carpeta con clips> <salida.mp4>`; se edita la lista `SEG` (clip, inicio, duración, velocidad, "rot"/crop), los `card/title/caption` y la lista `ovl` (tiempos de cada título).
+- Estilo cine: `reels/fiesta_underground/build_cine.py`.
+- Productos con IA "desarmándose" (vista explosionada): keyframes gpt_image_2_5 9:16 → minimax_h3 start/end 6 s → overlays + ffmpeg en sandbox (ver carrusel Super Duty en `piezas/carrusel_superduty/` y `piezas/ford_*`). Ojo realismo mecánico: bombillo sale por detrás con el vidrio apuntando hacia adentro.
+- Piezas foto: `piezas/<nombre>/` (npr_elegante, autobus_encava, pisos_hilux_kavak, mente_ocupada, sede_pueblo_llano_verdes…).
+- Reels anteriores con `vid_punch`/xfade rítmico: `reels/sporttrac_pioneer/build_sporttrac.py`.
 
 ## 7. Clientes mostrados
-- Esteban Lolo: Chevrolet EXR (historia).
-- Nixon, de Pueblo Llano: Ford Cargo 1721 (Reel del 19-oct; también el RETO del 21 pero sin su nombre).
-- Enderson Fabián Flórez (@endersonfabianflorez): Ford F-250 Super Duty, luces Scorpion.
-- Popular Man: Chevrolet NPR (sin detalle del trabajo).
-- Dueño del Aveo azul: nombre pendiente (Tovar).
-- Toyota Merú blanca (placa MDY 14H): dueño sin nombre (Reel del 22-oct).
-- Toyota Hembrita marrón: pisos 5D (Reel del 23-oct).
-- "Tufruta Mi Paquito": fiel cliente (camión de frutas, imagen del 15-oct).
-- Rifas Prestigio: Ford Fiesta azul, rotulado en proceso.
-
-## Carrusel piezas Ford Super Duty (en curso, 28-oct)
-- Portada: `piezas/proshot_ford_superduty` variante A "Frente cromado" (Higgsfield media 499bb531-198d-4c52-8dc4-4548761255d7).
-- Faro original: reel v2 (bombillo bien orientado) media 8d2191d5-275a-4ff3-b2a3-4e97988459c7. Keyframes jobs: frente fdc88d79, trasera corregida 40d02f1e, blanca 273d45b4, amarilla 484273bd.
-- Volante + tapa: reel media 5b02905c-258b-4ea5-a063-4d2edacff8ea. Keyframes: armado 37adcce9, tapa fuera 2c4c9b2a, trasera c67698c8. Cierre = clip 1 en reversa.
-- Método: gpt_image_2_5 keyframes 9:16 → minimax_h3 start/end 6 s → overlays.py + mk.sh (sandbox Higgsfield, carpetas faro/ y vol/).
-- Pendiente: más piezas, música de Samer, unir todo en carrusel (máx. 10 láminas), marcar isAiGenerated.
-- Fusilera: reel media 77261846-6032-42f4-b689-eaded9d0f086 (17 s). Keyframes: armada 72d53914 (sin tarjeta SecuriCode), fusibles fuera b45287dc. Clip + reversa. Ojo: la foto original trae el código de acceso del vehículo; en el repo quedó difuminado.
-- Parrillas (Super Duty negra original / Super Duty cromada / Tritón): reel media 97d27dfc-90b1-4201-9080-4d8644159854 (17 s). Keyframes 7deefafd (armadas), 4e5cfb50 (emblemas fuera). La negra no trae emblema en la foto: no se le inventó.
-- 28-oct 15:25 VERSIONES VIGENTES del carrusel Ford: faro v3 a65e91e1-3171-493a-ad0c-918a881c815b (sin frase 'por detrás, sin desarmar'), volante v2 73b15911-1602-4b56-b061-0effbdaaec64 (sin 'así vienen por detrás'), fusilera 77261846-6032-42f4-b689-eaded9d0f086, parrillas v2 b74ae3cc-1f21-4d99-ac70-bb784ab0f6c3 (3 parrillas sin reflejo, negra con emblema, keyframes 2b49e615 / 6f9ee241). Nota técnica: capas PNG vacías con ImageMagick → usar PNG32: o salen negras.
-- Exploradoras (par; la izquierda es espejo de la derecha): reel media a4a5e76e-6c6e-40df-beb5-e8ff05a7d0ce (17 s). Keyframes a16241d5 (frente), ddafdd38 (trasera, bombillos fuera bien orientados).
-- 28-oct: CARRUSEL 'Todo para tu Super Duty' programado en Metricool vie 30-oct 10:00 (id 409357121, IG POST, isAiGenerated). 7 láminas 4:5: portada (s1) + faro, volante, fusilera, parrillas, exploradoras (videos 4:5 con specs y música original sonilo_music job 80dde96e) + lámina contacto con lista de repuestos (s7). Script: piezas/carrusel_superduty/carrusel.py; composición en sandbox ~/car (comp.py, build.sh).
-- 28-oct: Reel Ford Fiesta (estilo cine v2 + música de Samer; luces policiales, bombillos LED, panorámica) programado sáb 31-oct 10:00, Metricool id 409428250. Lección: la marca (logo + ALEXMAR + teléfono) debe ir GRANDE todo el video; Samer rechazó el estilo glitch/underground y las frases genéricas.
-- 30-oct: Reel 'Llegaron las bandejas' (música de Samer) programado hoy vie 30-oct 13:00, Metricool id 411282406. Pendiente confirmar nombres Ekaizen / Machito LS79 / Terios Vigo. 'Mente ocupada' (post+historia) entregado 29-oct, sin programar.
+- Nixon (Pueblo Llano): Ford Cargo 1721. Enderson Fabián Flórez (@endersonfabianflorez): F-250 Scorpion. Esteban Lolo: Chevrolet EXR. Popular Man: NPR. Rifas Prestigio: Ford Fiesta azul (rotulado en proceso). "Tufruta Mi Paquito".
+- Toyota Merú blanca: luces policía (22-oct) y bandejas 5D (30-oct, sin nombre). Ford Fiesta plateado: luces policiales + LED + panorámica (31-oct, sin nombre).
+- Rotulados entregados: Azcar (Los Araques), Virgen de la Candelaria 60x8 cm (Corel).
