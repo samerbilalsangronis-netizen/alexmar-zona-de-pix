@@ -46,9 +46,9 @@ def build(src, W, H, out, story=False):
     put(cv, xt + 2, top + (lh + (bb[3] - bb[1])) // 2 - 4, "SEDE  PUEBLO  LLANO", mont(int(24 * k), "Bold"), CREAM, sp=4, anchor="l", op=230, blur=8)
     # frase
     y = top + lh + int(80 * k)
-    fq = ImageFont.truetype(ANTON, int(170 * k)); put(cv, W // 2, y - int(34 * k), "“", fq, TERRA, op=190)
-    y += int(96 * k)
-    y, _ = put(cv, W // 2, y, "Hasta que nademos", mont(int(74 * k), "Regular"), CREAM, op=230)
+    y += int(40 * k); f1 = mont(int(74 * k), "Regular"); w1 = ImageDraw.Draw(cv).textlength("Hasta que nademos", font=f1)
+    fq = ImageFont.truetype(ANTON, int(150 * k)); put(cv, int(W / 2 - w1 / 2 - 14 * k), y - int(30 * k), "“", fq, TERRA, anchor="r", op=190)
+    y, _ = put(cv, W // 2, y, "Hasta que nademos", f1, CREAM, op=230)
     y += int(4 * k)
     y, w2 = put(cv, W // 2, y, "entre los verdes.", mont(int(86 * k), "ExtraBold"), CREAM, op=235)
     dr = ImageDraw.Draw(cv); y += int(26 * k)
