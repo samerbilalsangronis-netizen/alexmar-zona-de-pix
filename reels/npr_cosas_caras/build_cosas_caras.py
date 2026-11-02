@@ -1,6 +1,6 @@
 """Reel 'Cosas caras' estilo ALEXMAR — NPR verde en la sede de Pueblo Llano.
 v2: tomas completas 16:9 (se ve el camión entero y el trabajo), color natural, fondo desenfocado;
-título CHEVROLET NPR arriba y la frase de la tendencia debajo del video. Marca grande.
+v3: sin frase, cliente corto, más tomas del camión (~20 s). Marca grande.
 1080x1920, sin audio. Uso: python build_cosas_caras.py <dir_clips a/b/c.mp4> <salida.mp4>"""
 import os, sys, subprocess
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -16,14 +16,17 @@ XF = 0.35
 
 # (clip, inicio, duración, centro x en la fuente 640x360)
 SEG = [("b", 0.0, 3.0),    # el NPR completo de lado, trabajando en la plataforma
-       ("a", 0.8, 2.6),    # instalando debajo de la plataforma, cajas
+       ("a", 0.4, 3.0),    # instalando debajo de la plataforma, cajas
+       ("a", 3.6, 1.4),    # rueda delantera y estribo
        ("b", 3.0, 2.0),    # recorrido al frente: cromados y parachoques
        ("c", 2.0, 1.3),    # el frente completo de la cabina
-       ("b", 6.2, 1.8),    # CHEVROLET tecnología ISUZU
-       ("c", 6.0, 1.6),    # luz ámbar de la cabina
-       ("c", 8.6, 4.0)]    # el cliente contento en su camión
+       ("b", 5.0, 2.6),    # parabrisas y emblema CHEVROLET tecnología ISUZU
+       ("c", 6.0, 1.8),    # luz ámbar de la cabina
+       ("b", 8.4, 2.2),    # recorrido por el lado de la cabina
+       ("a", 4.6, 1.8),    # la cabina por dentro
+       ("c", 9.0, 1.6)]    # el cliente saluda (corto)
 END = 2.8
-VW, VH, VY = 1080, 608, 470          # video 16:9 completo, sin recortar
+VW, VH, VY = 1080, 608, 600          # video 16:9 completo, sin recortar
 
 
 def mont(size, weight):
@@ -66,24 +69,16 @@ t = t.rotate(58, expand=True, resample=Image.BICUBIC); cv.alpha_composite(t, ((W
 cv.save(f"{TMP}/bars.png")
 
 # 2) la frase (estilo tendencia: centrada, texto claro con sombra)
-FR = ["A un camionero que sabe",
-      "trabajar y cuidar lo suyo,",
-      "lo único que le interesa",
-      "y le impresiona es la seriedad,",
-      "el trato y el detalle con que",
-      "le atiendes su camión."]
 cv = blank(); dr = ImageDraw.Draw(cv)
 # arriba del video: sede + vehículo
-y = text(cv, W // 2, BAR + 34, "SEDE  PUEBLO  LLANO", mont(28, "ExtraBold"), LIGHT, sp=9, op=230, blur=8) + 14
-text(cv, W // 2, y, "CHEVROLET  NPR", ImageFont.truetype(ANTON, 104), CREAM, sp=4, op=240, blur=12)
+y = text(cv, W // 2, VY - 250, "SEDE  PUEBLO  LLANO", mont(30, "ExtraBold"), LIGHT, sp=9, op=230, blur=8) + 18
+text(cv, W // 2, y, "CHEVROLET  NPR", ImageFont.truetype(ANTON, 130), CREAM, sp=4, op=240, blur=12)
 # líneas naranjas enmarcando el video
 dr.rectangle((0, VY - 5, W, VY), fill=TERRA + (255,)); dr.rectangle((0, VY + VH, W, VY + VH + 5), fill=TERRA + (255,))
-# debajo del video: la frase de la tendencia
-f = mont(44, "SemiBold"); y = VY + VH + 46
-for ln in FR: y = text(cv, W // 2, y, ln, f, CREAM, op=245, blur=12) + 12
-y += 14
-y = text(cv, W // 2, y, "Ya saben…", mont(44, "SemiBold"), CREAM, op=245, blur=12) + 14
-text(cv, W // 2, y, "COSAS DE ALEXMAR.", ImageFont.truetype(ANTON, 88), TERRA, sp=3, op=245, blur=14)
+# debajo del video
+y = text(cv, W // 2, VY + VH + 70, "TRABAJO  HECHO  EN", mont(30, "ExtraBold"), LIGHT, sp=9, op=230, blur=8) + 16
+y = text(cv, W // 2, y, "ALEXMAR", ImageFont.truetype(ANTON, 120), TERRA, sp=5, op=240, blur=12) + 18
+text(cv, W // 2, y, "C-9, sector La Curva de Los Luises", mont(32, "SemiBold"), CREAM, op=235, blur=10)
 cv.save(f"{TMP}/frase.png")
 
 # 3) cierre: logo gigante
