@@ -51,6 +51,21 @@ def text(cv, cx, y, s, font, fill, sp=0, op=220, blur=10):
 def blank(): return Image.new("RGBA", (W, H), (0, 0, 0, 0))
 
 
+import math, random
+def andes(cv, y_base, alto, op_back=70, op_front=150, seed=3):
+    """Silueta de la cordillera andina (dos filas de montañas) con borde naranja."""
+    rnd = random.Random(seed); lay = Image.new("RGBA", cv.size, (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    for fila, (amp, op, col) in enumerate([(1.0, op_back, LIGHT), (0.62, op_front, TERRA)]):
+        pts = [(0, y_base)]; x = -40; up = rnd.random() < 0.5
+        while x < W + 80:
+            h = rnd.uniform(0.55, 1.0) if up else rnd.uniform(0.12, 0.38)
+            pts.append((x, y_base - h * alto * amp)); x += rnd.randint(70, 150); up = not up
+        pts.append((W, y_base))
+        d.polygon(pts, fill=(16, 16, 16, op))
+        d.line(pts[1:-1], fill=col + (min(255, op + 90),), width=4 if fila else 3, joint="curve")
+    cv.alpha_composite(lay)
+
+
 # 1) barras con la marca grande + marca de agua
 cv = blank(); dr = ImageDraw.Draw(cv)
 dr.rectangle((0, 0, W, BAR), fill=(0, 0, 0, 255)); dr.rectangle((0, H - BAR, W, H), fill=(0, 0, 0, 255))
@@ -71,27 +86,32 @@ cv.save(f"{TMP}/bars.png")
 # 2) la frase (estilo tendencia: centrada, texto claro con sombra)
 cv = blank(); dr = ImageDraw.Draw(cv)
 # arriba del video: sede + vehículo
-y = text(cv, W // 2, VY - 250, "SEDE  PUEBLO  LLANO", mont(30, "ExtraBold"), LIGHT, sp=9, op=230, blur=8) + 18
+andes(cv, VY - 6, 120, op_back=70, op_front=140)
+y = text(cv, W // 2, VY - 262, "PUEBLO LLANO  ·  EDO. MÉRIDA", mont(30, "ExtraBold"), LIGHT, sp=7, op=240, blur=8) + 18
 text(cv, W // 2, y, "CHEVROLET  NPR", ImageFont.truetype(ANTON, 130), CREAM, sp=4, op=240, blur=12)
 # líneas naranjas enmarcando el video
 dr.rectangle((0, VY - 5, W, VY), fill=TERRA + (255,)); dr.rectangle((0, VY + VH, W, VY + VH + 5), fill=TERRA + (255,))
 # debajo del video
 y = text(cv, W // 2, VY + VH + 70, "TRABAJO  HECHO  EN", mont(30, "ExtraBold"), LIGHT, sp=9, op=230, blur=8) + 16
 y = text(cv, W // 2, y, "ALEXMAR", ImageFont.truetype(ANTON, 120), TERRA, sp=5, op=240, blur=12) + 18
-text(cv, W // 2, y, "C-9, sector La Curva de Los Luises", mont(32, "SemiBold"), CREAM, op=235, blur=10)
+y = text(cv, W // 2, y, "Pueblo Llano, estado Mérida", mont(34, "Bold"), CREAM, op=235, blur=10) + 10
+text(cv, W // 2, y, "C-9, sector La Curva de Los Luises", mont(28, "SemiBold"), LIGHT, op=235, blur=10)
+andes(cv, H - BAR, 110, op_back=80, op_front=150, seed=5)
 cv.save(f"{TMP}/frase.png")
 
 # 3) cierre: logo gigante
-cv = Image.new("RGBA", (W, H), (12, 12, 12, 255)); lw = 640
+cv = Image.new("RGBA", (W, H), (12, 12, 12, 255)); lw = 600
 lg = LOGO.resize((lw, int(LOGO.height * lw / LOGO.width)), Image.LANCZOS); lg, p = shadow(lg, 18, 220)
-cv.alpha_composite(lg, ((W - lg.width) // 2, 300 - p))
-y = 300 + lg.height - 2 * p + 40
+cv.alpha_composite(lg, ((W - lg.width) // 2, 200 - p))
+y = 200 + lg.height - 2 * p + 40
 y = text(cv, W // 2, y, "ALEXMAR", ImageFont.truetype(ANTON, 190), TERRA, sp=6) + 10
 y = text(cv, W // 2, y, "AUTOPERIQUITOS Y ROTULADOS", ImageFont.truetype(M9, 36), CREAM, sp=4) + 50
 y = text(cv, W // 2, y, "0416-676 83 93", ImageFont.truetype(ANTON, 130), CREAM, sp=3) + 30
 y = text(cv, W // 2, y, "Sede Pueblo Llano: C-9, sector La Curva de Los Luises", mont(32, "SemiBold"), LIGHT) + 12
 y = text(cv, W // 2, y, "Tovar: Carrera 4ta, El Llano", mont(32, "SemiBold"), LIGHT) + 12
 text(cv, W // 2, y, "Lunes a sábado · 8 am a 6 pm", mont(32, "SemiBold"), CREAM)
+andes(cv, H, 300, op_back=255, op_front=255, seed=5)
+text(cv, W // 2, H - 370, "PUEBLO LLANO  ·  EDO. MÉRIDA", mont(34, "ExtraBold"), CREAM, sp=7, op=240, blur=8)
 cv.convert("RGB").save(f"{TMP}/cierre.png")
 
 # 4) segmentos 16:9 completos, color natural (bajando el sol quemado) + nitidez
