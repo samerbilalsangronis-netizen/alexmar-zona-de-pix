@@ -124,6 +124,6 @@ fc.append(f"[pb][fx]overlay=shortest=1,trim=0:{vid_len:.3f},setpts=PTS-STARTPTS,
 fc.append(f"[{ci}:v]fps=30,format=yuv420p,trim=0:{END},setpts=PTS-STARTPTS,settb=1/30[end]")
 fc.append(f"[main][end]xfade=transition=fade:duration=0.5:offset={vid_len - 0.5:.3f}[out]")
 subprocess.run(["ffmpeg", "-v", "error", "-y", *inp, "-filter_complex", ";".join(fc), "-map", "[out]", "-an",
-                "-c:v", "libx264", "-preset", "veryfast", "-crf", "19", "-maxrate", "8M", "-bufsize", "16M",
+                "-c:v", "libx264", "-pix_fmt", "yuv420p", "-profile:v", "high", "-level", "4.1", "-preset", "veryfast", "-crf", "20", "-maxrate", "6M", "-bufsize", "16M",
                 "-movflags", "+faststart", "-r", "30", OUT], check=True)
 print("ok", round(vid_len + END - 0.5, 2), "s")
