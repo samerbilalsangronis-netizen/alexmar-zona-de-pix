@@ -1,5 +1,6 @@
 """Reel 'Cosas caras' estilo ALEXMAR — NPR verde en la sede de Pueblo Llano.
-Formato de tendencia: frase reflexiva centrada sobre tomas oscuras y cinematográficas, con la marca grande.
+v2: tomas completas 16:9 (se ve el camión entero y el trabajo), color natural, fondo desenfocado;
+título CHEVROLET NPR arriba y la frase de la tendencia debajo del video. Marca grande.
 1080x1920, sin audio. Uso: python build_cosas_caras.py <dir_clips a/b/c.mp4> <salida.mp4>"""
 import os, sys, subprocess
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -14,13 +15,15 @@ TMP = os.path.join(SRC, "_tmp"); os.makedirs(TMP, exist_ok=True)
 XF = 0.35
 
 # (clip, inicio, duración, centro x en la fuente 640x360)
-SEG = [("b", 0.0, 2.2, 330),    # el NPR completo, trabajando en la plataforma
-       ("a", 1.0, 2.0, 500),    # trabajando debajo de la plataforma
-       ("b", 6.2, 1.8, 330),    # CHEVROLET tecnología ISUZU
-       ("c", 6.6, 1.4, 300),    # luz ámbar de la cabina
-       ("a", 4.6, 1.3, 420),    # la cabina por dentro
-       ("c", 8.5, 4.2, 300)]    # el cliente contento en su camión
+SEG = [("b", 0.0, 3.0),    # el NPR completo de lado, trabajando en la plataforma
+       ("a", 0.8, 2.6),    # instalando debajo de la plataforma, cajas
+       ("b", 3.0, 2.0),    # recorrido al frente: cromados y parachoques
+       ("c", 2.0, 1.3),    # el frente completo de la cabina
+       ("b", 6.2, 1.8),    # CHEVROLET tecnología ISUZU
+       ("c", 6.0, 1.6),    # luz ámbar de la cabina
+       ("c", 8.6, 4.0)]    # el cliente contento en su camión
 END = 2.8
+VW, VH, VY = 1080, 608, 470          # video 16:9 completo, sin recortar
 
 
 def mont(size, weight):
@@ -69,13 +72,18 @@ FR = ["A un camionero que sabe",
       "y le impresiona es la seriedad,",
       "el trato y el detalle con que",
       "le atiendes su camión."]
-cv = blank()
-f = mont(50, "SemiBold"); y = BAR + int(MH * 0.40)
-text(cv, W // 2, y - 70, "SEDE  PUEBLO  LLANO", mont(26, "ExtraBold"), LIGHT, sp=8, op=230, blur=8)
-for ln in FR: y = text(cv, W // 2, y, ln, f, CREAM, op=245, blur=12) + 14
-y += 18
-y = text(cv, W // 2, y, "Ya saben…", mont(50, "SemiBold"), CREAM, op=245, blur=12) + 16
-text(cv, W // 2, y, "COSAS DE ALEXMAR.", ImageFont.truetype(ANTON, 92), TERRA, sp=3, op=245, blur=14)
+cv = blank(); dr = ImageDraw.Draw(cv)
+# arriba del video: sede + vehículo
+y = text(cv, W // 2, BAR + 34, "SEDE  PUEBLO  LLANO", mont(28, "ExtraBold"), LIGHT, sp=9, op=230, blur=8) + 14
+text(cv, W // 2, y, "CHEVROLET  NPR", ImageFont.truetype(ANTON, 104), CREAM, sp=4, op=240, blur=12)
+# líneas naranjas enmarcando el video
+dr.rectangle((0, VY - 5, W, VY), fill=TERRA + (255,)); dr.rectangle((0, VY + VH, W, VY + VH + 5), fill=TERRA + (255,))
+# debajo del video: la frase de la tendencia
+f = mont(44, "SemiBold"); y = VY + VH + 46
+for ln in FR: y = text(cv, W // 2, y, ln, f, CREAM, op=245, blur=12) + 12
+y += 14
+y = text(cv, W // 2, y, "Ya saben…", mont(44, "SemiBold"), CREAM, op=245, blur=12) + 14
+text(cv, W // 2, y, "COSAS DE ALEXMAR.", ImageFont.truetype(ANTON, 88), TERRA, sp=3, op=245, blur=14)
 cv.save(f"{TMP}/frase.png")
 
 # 3) cierre: logo gigante
@@ -91,17 +99,14 @@ y = text(cv, W // 2, y, "Tovar: Carrera 4ta, El Llano", mont(32, "SemiBold"), LI
 text(cv, W // 2, y, "Lunes a sábado · 8 am a 6 pm", mont(32, "SemiBold"), CREAM)
 cv.convert("RGB").save(f"{TMP}/cierre.png")
 
-# 4) segmentos: recorte vertical, mejora de calidad, look oscuro/cinematográfico
-GRADE = ("hqdn3d=3:3:6:6,scale={w}:{h}:flags=lanczos,unsharp=5:5:0.8,"
-         "eq=saturation=0.62:contrast=1.08:brightness=-0.07:gamma=0.92,"
-         "colorbalance=rs=-0.04:bs=0.06:rh=0.07:bh=-0.05,"
-         "curves=all='0/0 0.5/0.40 1/0.88',vignette=PI/4.2")
-cw = round(360 * W / MH) // 2 * 2       # ancho de recorte en la fuente
+# 4) segmentos 16:9 completos, color natural (bajando el sol quemado) + nitidez
+GRADE = ("hqdn3d=2:2:5:5,curves=all='0/0 0.5/0.48 0.85/0.78 1/0.9',"
+         "eq=saturation=1.06:contrast=1.06:gamma=0.95,scale={w}:{h}:flags=lanczos,unsharp=5:5:0.9")
 segs = []
-for i, (c, ss, d, cx) in enumerate(SEG):
-    x = max(0, min(640 - cw, cx - cw // 2)); o = f"{TMP}/s{i}.mp4"
-    vf = (f"crop={cw}:360:{x}:0," + GRADE.format(w=int(W * 1.08), h=int(MH * 1.08)) +
-          f",crop={W}:{MH}:'(iw-{W})*(0.5+0.5*t/{d})':'(ih-{MH})/2',fps=30,format=yuv420p")
+for i, (c, ss, d) in enumerate(SEG):
+    o = f"{TMP}/s{i}.mp4"; zw, zh = int(VW * 1.05) // 2 * 2, int(VH * 1.05) // 2 * 2
+    vf = (GRADE.format(w=zw, h=zh) +
+          f",crop={VW}:{VH}:'(iw-{VW})*(t/{d})':'(ih-{VH})/2',fps=30,format=yuv420p")
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(ss), "-t", str(d), "-i", f"{SRC}/{c}.mp4",
                     "-vf", vf, "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "16", o], check=True)
     segs.append((o, d))
@@ -117,8 +122,10 @@ vid_len = sum(d for _, d in segs) - XF * (n - 1)
 inp += ["-loop", "1", "-i", f"{TMP}/bars.png", "-loop", "1", "-i", f"{TMP}/frase.png",
         "-loop", "1", "-t", str(END), "-i", f"{TMP}/cierre.png"]
 b, fr, ci = n, n + 1, n + 2
-fc.append(f"{prev}pad={W}:{H}:0:{BAR}:black[pv]")
-fc.append(f"[{fr}:v]format=rgba,fade=in:st=0.4:d=0.8:alpha=1,fade=out:st={vid_len - 0.6:.2f}:d=0.5:alpha=1[fx]")
+fc.append(f"{prev}split[v1][v2]")
+fc.append(f"[v1]scale=-2:{MH},crop={W}:{MH},boxblur=28:2,eq=brightness=-0.20:saturation=0.85,pad={W}:{H}:0:{BAR}:black[bgp]")
+fc.append(f"[bgp][v2]overlay=0:{VY}[pv]")
+fc.append(f"[{fr}:v]format=rgba,fade=in:st=0.2:d=0.6:alpha=1,fade=out:st={vid_len - 0.6:.2f}:d=0.5:alpha=1[fx]")
 fc.append(f"[pv][{b}:v]overlay=shortest=1[pb]")
 fc.append(f"[pb][fx]overlay=shortest=1,trim=0:{vid_len:.3f},setpts=PTS-STARTPTS,fps=30,settb=1/30,format=yuv420p[main]")
 fc.append(f"[{ci}:v]fps=30,format=yuv420p,trim=0:{END},setpts=PTS-STARTPTS,settb=1/30[end]")
