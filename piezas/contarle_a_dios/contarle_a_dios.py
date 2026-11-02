@@ -41,7 +41,7 @@ def develop(src):
     out = out.filter(ImageFilter.UnsharpMask(radius=40, percent=22, threshold=0))
     out = out.filter(ImageFilter.UnsharpMask(radius=1.6, percent=70, threshold=2))
     # 6) profundidad de campo: fondo de la tienda desenfocado, escritorio nítido
-    bg = out.filter(ImageFilter.GaussianBlur(9))
+    bg = out.filter(ImageFilter.GaussianBlur(7))
     yy = np.arange(H, dtype=np.float32)[:, None]
     mask = np.clip((640 - yy) / 230, 0, 1) ** 1.2 * np.ones((1, W), np.float32)
     a = to_np(out) * (1 - mask[..., None]) + to_np(bg) * mask[..., None]
@@ -71,19 +71,33 @@ def put(cv, x, y, s, font, fill, sp=0, op=200, blur=14, anchor="c"):
 
 
 def piece(photo, W, H, cx, out, story=False):
-    s = H / photo.height if photo.width * H / photo.height >= W else W / photo.width
-    ph = photo.resize((round(photo.width * s), round(photo.height * s)), Image.LANCZOS)
-    x0 = int(min(max(0, cx * s - W / 2), ph.width - W)); cv = ph.crop((x0, 0, x0 + W, H)).convert("RGBA")
+    # foto COMPLETA a lo ancho (se ve toda la tienda); arriba/abajo se extiende el fondo desenfocado
+    ph = photo.resize((W, round(photo.height * W / photo.width)), Image.LANCZOS).convert("RGBA")
+    py = H - ph.height
+    cv = Image.new("RGBA", (W, H), (0, 0, 0, 255))
+    if py > 0:  # extensión superior: franja de arriba estirada y muy desenfocada
+        ext = ph.crop((0, 0, W, 220)).resize((W, py + 260), Image.BICUBIC).filter(ImageFilter.GaussianBlur(26))
+        cv.alpha_composite(ext, (0, 0))
+    yb = py + ph.height
+    if yb < H:  # extensión inferior (historia)
+        ext = ph.crop((0, ph.height - 160, W, ph.height)).resize((W, H - yb + 200), Image.BICUBIC).filter(ImageFilter.GaussianBlur(26))
+        cv.alpha_composite(ext, (0, yb - 200))
+    m = Image.new("L", ph.size, 255); dm = ImageDraw.Draw(m)
+    for i in range(140):
+        a = int(255 * (i / 140) ** 1.2)
+        if py > 0: dm.line((0, i, W, i), fill=a)
+        if yb < H: dm.line((0, ph.height - 1 - i, W, ph.height - 1 - i), fill=min(a, 255))
+    ph.putalpha(m); cv.alpha_composite(ph, (0, py))
     # sombra suave arriba para la frase, y abajo para la marca
     g = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(g)
-    top = int(H * (0.42 if not story else 0.40))
+    top = int(H * (0.50 if not story else 0.40))
     for y in range(top): d.line((0, y, W, y), fill=(0, 0, 0, int(120 * (1 - y / top) ** 1.4)))
     b0 = int(H * 0.86)
     for y in range(b0, H): d.line((0, y, W, y), fill=(0, 0, 0, int(190 * ((y - b0) / (H - b0)) ** 1.2)))
     cv.alpha_composite(g)
     # frase manuscrita
     k = 1.0 if not story else 1.08
-    sizes = [56, 56, 70, 70]; y = int(H * (0.045 if not story else 0.12)); rot = [-2.2, 1.4, -1.0, 1.8]
+    sizes = [60, 60, 76, 76]; y = int(H * (0.06 if not story else 0.16)); rot = [-2.2, 1.4, -1.0, 1.8]
     for ln, sz, r in zip(LINES, sizes, rot):
         f = ImageFont.truetype(HAND, int(sz * k))
         lay = Image.new("RGBA", (W, int(sz * k * 2.6)), (0, 0, 0, 0)); put(lay, W // 2, int(sz * k * 0.5), ln, f, CREAM, sp=2, op=210, blur=16)
@@ -91,7 +105,7 @@ def piece(photo, W, H, cx, out, story=False):
         y += int(sz * k * 1.5)
     # marca discreta abajo: logo + ALEXMAR + @ + teléfono
     lh = 92 if not story else 110; lg = LOGO.resize((int(LOGO.width * lh / LOGO.height), lh), Image.LANCZOS)
-    by = H - lh - (34 if not story else 150); lgs, p = shadow(lg, 8, 170); cv.alpha_composite(lgs, (40 - p, by - p))
+    by = H - lh - (34 if not story else 60); lgs, p = shadow(lg, 8, 170); cv.alpha_composite(lgs, (40 - p, by - p))
     xt = 40 + lg.width + 20
     put(cv, xt, by + 4, "ALEXMAR", ImageFont.truetype(ANTON, 54 if not story else 62), TERRA, sp=3, op=200, blur=8, anchor="l")
     put(cv, xt + 2, by + (66 if not story else 76), "@autoalexmar_car  ·  0416-676 83 93", mont(24 if not story else 27, "SemiBold"), CREAM, op=220, blur=6, anchor="l")
