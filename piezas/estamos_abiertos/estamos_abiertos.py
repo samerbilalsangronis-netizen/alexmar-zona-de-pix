@@ -53,7 +53,7 @@ put(cv, xt, 22, "ALEXMAR", fa, TERRA, sp=6, op=0, anchor="l")
 put(cv, xt + 4, 140, "AUTOPERIQUITOS Y ROTULADOS", mont(23, "Bold"), CREAM, sp=3, op=0, anchor="l")
 
 # titular sobre el piso (zona derecha, sin tapar el camión)
-grad(cv, 760, H - 150, 0, 200)
+grad(cv, 640, H - 150, 0, 225)
 xr = W - 46
 y = put(cv, xr, 800, "TOVAR  ·  PUEBLO LLANO", mont(28, "ExtraBold"), LIGHT, sp=6, op=230, blur=10)
 ImageDraw.Draw(cv).rectangle((xr - 110, y + 14, xr, y + 19), fill=TERRA + (255,))
