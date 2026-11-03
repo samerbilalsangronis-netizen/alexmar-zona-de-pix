@@ -1,4 +1,4 @@
-"""/proshot — Pisos 3D Toyota Hilux 2006-2017: recorte real sin IA + diseño ALEXMAR (post 1080x1350).
+"""/proshot — Pisos 3D Toyota Hilux Kavak 2006-2017: recorte real sin IA + diseño ALEXMAR (post 1080x1350).
 Uso: python pisos_fiesta_move.py <recorte.png> <dir_plantillas> <salida.jpg>"""
 import sys
 import numpy as np
@@ -59,13 +59,13 @@ cv.alpha_composite(pr, (px, py))
 dr = ImageDraw.Draw(cv)
 lg = LOGO.resize((int(LOGO.width * 118 / LOGO.height), 118), Image.LANCZOS); lgs, p = shadow(lg, 8, 180)
 cv.alpha_composite(lgs, (W - lg.width - 40 - p, 34 - p))
-put(cv, 52, 52, "TOYOTA  HILUX  ·  2006–2017", mont(27, "ExtraBold"), LIGHT, sp=4, op=0, anchor="l")
+put(cv, 52, 52, "TOYOTA  HILUX  KAVAK  ·  2006–2017", mont(27, "ExtraBold"), LIGHT, sp=4, op=0, anchor="l")
 ImageDraw.Draw(cv).rectangle((52, 100, 152, 105), fill=TERRA + (255,))
 y, _ = put(cv, 48, 118, "PISOS 3D", ImageFont.truetype(ANTON, 104), CREAM, sp=3, op=200, anchor="l")
-put(cv, 48, y + 2, "PARA TOYOTA HILUX", ImageFont.truetype(ANTON, 60), TERRA, sp=3, op=200, anchor="l")
+put(cv, 48, y + 2, "PARA HILUX KAVAK", ImageFont.truetype(ANTON, 60), TERRA, sp=3, op=200, anchor="l")
 
 # especificaciones (solo lo confirmado / visible)
-specs = ["Juego completo: 2 delanteros + trasero", "Modelos 2006 al 2017"]
+specs = ["Juego completo: 2 delanteros + trasero", "Hilux Kavak 2006 al 2017"]
 yb = 1092; f = mont(28, "SemiBold")
 for i, t in enumerate(specs):
     tw = ImageDraw.Draw(cv).textlength(t, font=f); x = (W - tw - 40) // 2; yy_ = yb + i * 56
