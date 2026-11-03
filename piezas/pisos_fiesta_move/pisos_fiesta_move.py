@@ -1,5 +1,5 @@
-"""/proshot — Pisos Ford Fiesta Move: foto de estudio IA + diseño ALEXMAR (post 1080x1350).
-Uso: python pisos_fortuner.py <foto_ia.png> <dir_plantillas> <salida.jpg>"""
+"""/proshot — Pisos Ford Fiesta Move: recorte real sin IA + diseño ALEXMAR (post 1080x1350).
+Uso: python pisos_fiesta_move.py <recorte.png> <dir_plantillas> <salida.jpg>"""
 import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -30,26 +30,30 @@ def put(cv, x, y, s, font, fill, sp=0, op=200, blur=12, anchor="c"):
     cv.alpha_composite(lay, (int(X), int(y - p))); return y + lay.height - 2 * p, lay.width - 2 * p
 
 
-# fondo: tono del estudio de la foto IA
-ia = Image.open(SRC).convert("RGB")
-a = np.asarray(ia, np.float32)
-corner = np.concatenate([a[:60, :60].reshape(-1, 3), a[:60, -60:].reshape(-1, 3), a[-60:, :60].reshape(-1, 3), a[-60:, -60:].reshape(-1, 3)]).mean(0)
+# fondo carbón con luz suave al centro
 yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
 d = np.sqrt(((xx - W / 2) / W) ** 2 + ((yy - H * 0.52) / H) ** 2)
-bg = np.clip(corner[None, None, :] * (1.35 - 0.9 * d[..., None]), 0, 255)
+base = np.array([30, 29, 28], np.float32)
+bg = np.clip(base[None, None, :] * (1.45 - 1.1 * d[..., None]), 0, 255)
 cv = Image.fromarray(bg.astype(np.uint8)).convert("RGBA")
 
-# producto: recorte de los pisos con bordes difuminados hacia el fondo
-lum = a.mean(2); m = lum > corner.mean() + 18
-ys, xs = np.nonzero(m[40:-40, 40:-40]); ys += 40; xs += 40
-x0, x1 = np.percentile(xs, [0.3, 99.7]).astype(int); y0, y1 = np.percentile(ys, [0.3, 99.7]).astype(int)
-pad = 40; crop = ia.crop((max(0, x0 - pad), max(0, y0 - pad), min(ia.width, x1 + pad), min(ia.height, y1 + pad)))
-TOP, BOT = 300, 1080                                     # zona del producto
-s = min((BOT - TOP) / crop.height, 960 / crop.width)
-crop = crop.resize((round(crop.width * s), round(crop.height * s)), Image.LANCZOS).convert("RGBA")
-fm = Image.new("L", crop.size, 0); ImageDraw.Draw(fm).rectangle((26, 26, crop.width - 26, crop.height - 26), fill=255)
-crop.putalpha(fm.filter(ImageFilter.GaussianBlur(20)))
-cv.alpha_composite(crop, ((W - crop.width) // 2, TOP + (BOT - TOP - crop.height) // 2))
+# producto: recorte REAL (sin IA), color neutro, brillo naranja de borde y sombra
+pr = Image.open(SRC).convert("RGBA")
+rgb = np.asarray(pr.convert("RGB"), np.float32) / 255; al = pr.split()[3]
+g = rgb.mean(2, keepdims=True); al = al.filter(ImageFilter.MinFilter(35)).filter(ImageFilter.MaxFilter(35))
+rgb = g + (rgb - g) * 0.35          # quita el reflejo naranja del piso de baldosas
+rgb = np.clip((rgb - 0.5) * 1.12 + 0.5 - 0.02, 0, 1)
+pr = Image.fromarray((rgb * 255).astype(np.uint8)).convert("RGBA"); pr.putalpha(al)
+TOP, BOT = 300, 1080
+s = min((BOT - TOP) / pr.height, 960 / pr.width)
+pr = pr.resize((round(pr.width * s), round(pr.height * s)), Image.LANCZOS)
+px, py = (W - pr.width) // 2, TOP + (BOT - TOP - pr.height) // 2
+A = pr.split()[3]
+sh = Image.new("RGBA", pr.size, (0, 0, 0, 0)); sh.putalpha(A.filter(ImageFilter.GaussianBlur(18)).point(lambda v: v * 200 // 255))
+cv.alpha_composite(sh, (px + 8, py + 18))
+rim = Image.new("RGBA", pr.size, TERRA + (0,)); rim.putalpha(A.filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.GaussianBlur(7)).point(lambda v: v * 150 // 255))
+cv.alpha_composite(rim, (px, py))
+cv.alpha_composite(pr, (px, py))
 
 # arriba: logo + kicker + nombre
 dr = ImageDraw.Draw(cv)
@@ -81,4 +85,4 @@ wm = Image.new("RGBA", (1500, 420), (0, 0, 0, 0))
 ImageDraw.Draw(wm).text((20, 0), "ALEXMAR", font=ImageFont.truetype(ANTON, 320), fill=(255, 255, 255, 10))
 wm = wm.rotate(55, expand=True, resample=Image.BICUBIC); cv.alpha_composite(wm, ((W - wm.width) // 2, (H - wm.height) // 2))
 cv.convert("RGB").save(OUT, quality=94)
-print("ok", crop.size)
+print("ok", pr.size)
