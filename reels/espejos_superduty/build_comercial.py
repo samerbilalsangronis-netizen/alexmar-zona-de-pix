@@ -39,7 +39,7 @@ def blank(): return Image.new("RGBA", (W, H), (0, 0, 0, 0))
 def title(name, kicker, big, sub=None, y=1380):
     cv = blank(); g = ImageDraw.Draw(cv)
     for yy in range(y - 260, H):                      # sombra inferior para leer
-        t = min(1, (yy - (y - 260)) / 300); g.line((0, yy, W, yy), fill=(0, 0, 0, int(190 * t)))
+        t = min(1, (yy - (y - 260)) / 300); g.line((0, yy, W, yy), fill=(0, 0, 0, int(160 * t)))
     yy = text(cv, W // 2, y, kicker, mont(30, "Medium"), CREAM, sp=16, op=200, blur=8) + 26
     g = ImageDraw.Draw(cv); g.rectangle((W // 2 - 70, yy, W // 2 + 70, yy + 3), fill=TERRA + (255,)); yy += 30
     f = mont(84, "ExtraBold")
@@ -56,7 +56,7 @@ title("t4", "EL  JUEGO  COMPLETO", "ORIGINAL SUPER DUTY", "Ya disponibles en ALE
 
 # --- marca fija: logo GRANDE arriba + teléfono abajo (sin marco) ---
 cv = blank(); g = ImageDraw.Draw(cv)
-for yy in range(0, 380): g.line((0, yy, W, yy), fill=(0, 0, 0, int(150 * (1 - yy / 380) ** 1.5)))
+for yy in range(0, 380): g.line((0, yy, W, yy), fill=(0, 0, 0, int(90 * (1 - yy / 380) ** 1.5)))
 lw = 380; lg = LOGO.resize((lw, int(LOGO.height * lw / LOGO.width)), Image.LANCZOS); lgs, p = shadow(lg, 16, 220)
 cv.alpha_composite(lgs, ((W - lg.width) // 2 - p, 70 - p))
 wm = Image.new("RGBA", (1500, 420), (0, 0, 0, 0)); ImageDraw.Draw(wm).text((20, 0), "ALEXMAR", font=ImageFont.truetype(ANTON, 320), fill=(255, 255, 255, 13))
@@ -97,9 +97,9 @@ SEG = [("f1", 0, 2.4, "in", "t1", False),     # la caja
        ("v2", 6.2, 2.0, "v", None, False),
        ("f6", 0, 3.0, "pan_r", "t4", True)]     # el par
 END = 3.2; XF = 0.35
-GRADE = ("eq=gamma=1.18:contrast=1.14:saturation=0.92,"
-         "colorbalance=rs=-0.05:gs=-0.01:bs=0.07:rh=0.06:gh=0.02:bh=-0.05,"
-         "curves=master='0/0 0.25/0.20 0.75/0.82 1/1',unsharp=5:5:0.7,vignette=PI/5")
+GRADE = ("eq=gamma=1.38:brightness=0.04:contrast=1.06:saturation=1.10,"
+         "colorbalance=rh=0.03:gh=0.01:bh=-0.02,"
+         "curves=master='0/0.03 0.3/0.38 0.7/0.82 1/1',unsharp=5:5:0.8,vignette=PI/9")
 
 durs = []
 for i, (c, ss, d, mv, tt, sw) in enumerate(SEG):
